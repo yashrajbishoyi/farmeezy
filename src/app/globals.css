@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 45 15% 95%; /* #F5F4F0 Canvas */
+    --foreground: 150 27% 11%; /* #14231C Ink */
+    --card: 0 0% 100%; /* #FFFFFF Paper */
+    --card-foreground: 150 27% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 27% 11%;
+    --primary: 150 27% 11%; /* #14231C Ink primary buttons */
+    --primary-foreground: 45 15% 95%;
+    --secondary: 45 15% 95%;
+    --secondary-foreground: 150 27% 11%;
+    --muted: 90 5% 37%; /* #5C6259 */
+    --muted-foreground: 90 5% 37%;
+    --accent: 154 30% 18%; /* #1F3A2E Dusk Green */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 54% 49%; /* #C13B3B Critical */
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 12% 87%; /* #E3E1D9 Hairline */
+    --input: 45 12% 87%;
+    --ring: 150 27% 11%;
+    --radius: 1.25rem;
+  }
+}
+
+body {
+  color: #14231C;
+  background-color: #F5F4F0;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Eyebrow Label Standard */
+.eyebrow {
+  @apply text-[12px] sm:text-[13px] uppercase tracking-[0.08em] text-[#5C6259] font-medium;
+}
+
+/* Editorial display font helpers */
+.display-headline {
+  @apply font-normal tracking-[-0.025em] text-[#14231C];
+}
+
+/* Custom Risk Badges (Exact hex values preserved exclusively for risk data) */
+.risk-pill-low {
+  background-color: #2F9E5C;
+  color: #FFFFFF;
+}
+.risk-pill-mod {
+  background-color: #D9A62E;
+  color: #FFFFFF;
+}
+.risk-pill-high {
+  background-color: #E0722F;
+  color: #FFFFFF;
+}
+.risk-pill-crit {
+  background-color: #C13B3B;
+  color: #FFFFFF;
+}
+
+/* Leaflet container fixes */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 1.25rem;
+  z-index: 10;
+  background-color: #F5F4F0;
+}
