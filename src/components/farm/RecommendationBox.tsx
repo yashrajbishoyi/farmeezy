@@ -4,12 +4,26 @@ import React from 'react';
 import { ActionRecommendation } from '@/types';
 import { ShieldAlert, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 interface RecommendationBoxProps {
   recommendation: ActionRecommendation;
 }
 
+/** Maps raw timing enum values to translation keys. */
+function formatTiming(timing: string): string {
+  const map: Record<string, string> = {
+    within_24_hours: 'Within 24 Hours',
+    within_48_hours: 'Within 48 Hours',
+    within_72_hours: 'Within 72 Hours',
+    immediate: 'Immediate',
+    within_a_week: 'Within a Week',
+  };
+  return map[timing] || timing;
+}
+
 export function RecommendationBox({ recommendation }: RecommendationBoxProps) {
+  const { t } = useTranslation();
   const isImmediate = recommendation.timing === 'within_24_hours' || recommendation.priority === 'high';
 
   return (
@@ -19,15 +33,15 @@ export function RecommendationBox({ recommendation }: RecommendationBoxProps) {
         <div className="space-y-1">
           <div className="text-[11px] uppercase tracking-[0.08em] text-[#869283] font-medium flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E0722F]" />
-            PRIMARY AGRONOMIC ADVISORY
+            {t('PRIMARY AGRONOMIC ADVISORY')}
           </div>
           <h3 className="text-[22px] sm:text-[24px] font-normal leading-tight text-white">
-            {recommendation.action}
+            {t(recommendation.action)}
           </h3>
         </div>
         <div className="self-start sm:self-auto">
           <span className="inline-block px-3 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white border border-white/15">
-            {recommendation.timing}
+            {t(formatTiming(recommendation.timing))}
           </span>
         </div>
       </div>
@@ -37,13 +51,13 @@ export function RecommendationBox({ recommendation }: RecommendationBoxProps) {
         {/* Biological Controls */}
         <div className="space-y-2.5">
           <span className="text-[12px] uppercase tracking-[0.08em] text-[#A3ABA0] font-medium block">
-            Approved Bio-Control Application:
+            {t('Get Expert Advisory')}:
           </span>
           <ul className="space-y-2 text-[#E4EBE2]">
             {recommendation.biological_measures?.map((bio, idx) => (
               <li key={idx} className="flex items-start gap-2 leading-relaxed">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2F9E5C] mt-2 shrink-0" />
-                <span>{bio}</span>
+                <span>{t(bio)}</span>
               </li>
             ))}
           </ul>
@@ -52,13 +66,13 @@ export function RecommendationBox({ recommendation }: RecommendationBoxProps) {
         {/* Cultural Measures */}
         <div className="space-y-2.5">
           <span className="text-[12px] uppercase tracking-[0.08em] text-[#A3ABA0] font-medium block">
-            Cultural & Field Sanitization:
+            {t('Early Detection & Management')}:
           </span>
           <ul className="space-y-2 text-[#E4EBE2]">
             {recommendation.cultural_measures?.map((cult, idx) => (
               <li key={idx} className="flex items-start gap-2 leading-relaxed">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E3E1D9]/60 mt-2 shrink-0" />
-                <span>{cult}</span>
+                <span>{t(cult)}</span>
               </li>
             ))}
           </ul>
@@ -68,14 +82,14 @@ export function RecommendationBox({ recommendation }: RecommendationBoxProps) {
       {/* Footer Strip with Inverted Pill Button */}
       <div className="pt-4 border-t border-[#2B4E3E] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <p className="text-[12px] text-[#A3ABA0] max-w-md leading-normal">
-          {recommendation.reason} · <span className="text-[#869283]">{recommendation.safety_notice}</span>
+          {t(recommendation.reason)} · <span className="text-[#869283]">{t(recommendation.safety_notice)}</span>
         </p>
 
         <button
           onClick={() => alert('Advisory protocol logged. Field instructions sent to KVK extension desk.')}
           className="inline-flex items-center justify-center rounded-full bg-white text-[#1F3A2E] hover:bg-[#F5F4F0] px-5 py-2.5 text-[13px] font-medium transition-all group shrink-0"
         >
-          <span>Acknowledge Protocol</span>
+          <span>{t('Acknowledge Protocol')}</span>
           <span className="w-4 h-4 rounded-full bg-[#1F3A2E]/10 group-hover:bg-[#1F3A2E]/20 transition-colors flex items-center justify-center ml-2 shrink-0">
             <ArrowRight className="w-2.5 h-2.5 text-[#1F3A2E]" />
           </span>

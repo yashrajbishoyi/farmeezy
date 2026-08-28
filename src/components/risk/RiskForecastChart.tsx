@@ -12,14 +12,17 @@ import {
   ReferenceLine
 } from 'recharts';
 import { RiskForecastPoint } from '@/types';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 interface RiskForecastChartProps {
   forecast: RiskForecastPoint[];
 }
 
 export function RiskForecastChart({ forecast }: RiskForecastChartProps) {
+  const { t } = useTranslation();
+
   const chartData = forecast.map((pt, idx) => ({
-    name: idx === 0 ? 'Today' : `Day +${pt.day_offset}`,
+    name: idx === 0 ? t('Today') : `${t('Day')} +${pt.day_offset}`,
     date: pt.date,
     risk: pt.risk_score,
     rainfall: pt.rainfall_expected,
@@ -36,10 +39,10 @@ export function RiskForecastChart({ forecast }: RiskForecastChartProps) {
         <div className="bg-[#14231C] text-white p-3 rounded-xl shadow-md text-[12px] space-y-1 border border-[#23372E]">
           <p className="font-medium text-[#F5F4F0]">{label} ({data.date})</p>
           <p className="font-semibold text-[#E0722F]">
-            Pathogen Risk: {data.risk}/100 ({data.level.toUpperCase()})
+            {t('1. Pathogen Risk')}: {data.risk}/100 ({t(data.level.toUpperCase())})
           </p>
           <p className="text-[#A3ABA0]">
-            Rainfall Expected: {data.rainfall} mm
+            {t('24h Rainfall')}: {data.rainfall} mm
           </p>
         </div>
       );
@@ -53,14 +56,14 @@ export function RiskForecastChart({ forecast }: RiskForecastChartProps) {
       <div className="flex items-start justify-between border-b border-[#E3E1D9] pb-4">
         <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium mb-0.5">
-            EPIDEMIOLOGICAL TRAJECTORY
+            {t('EPIDEMIOLOGICAL TRAJECTORY')}
           </div>
           <h3 className="text-[20px] font-normal text-[#14231C]">
-            7-Day Deterministic Risk Curve
+            {t('7-Day Deterministic Risk Curve')}
           </h3>
         </div>
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#C13B3B] text-white">
-          Peak {maxRisk}/100
+          {t('Peak')} {maxRisk}/100
         </span>
       </div>
 
@@ -95,8 +98,8 @@ export function RiskForecastChart({ forecast }: RiskForecastChartProps) {
       </div>
 
       <div className="flex items-center justify-between text-[11px] text-[#5C6259] pt-3 border-t border-[#E3E1D9]">
-        <span>Calculated with Open-Meteo precipitation and humidity forecast.</span>
-        <span className="font-medium text-[#C13B3B]">Trajectory: Accelerating</span>
+        <span>{t('Calculated with Open-Meteo precipitation and humidity forecast.')}</span>
+        <span className="font-medium text-[#C13B3B]">{t('Trajectory: Accelerating')}</span>
       </div>
     </div>
   );

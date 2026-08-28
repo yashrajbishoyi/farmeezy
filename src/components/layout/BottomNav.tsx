@@ -13,10 +13,12 @@ import {
 } from 'lucide-react';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 export function BottomNav() {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   // Hide bottom nav on landing page, login page, or before explicit authentication
   if (!user || isLoading || pathname === '/' || pathname === '/login') {
@@ -33,7 +35,7 @@ export function BottomNav() {
           }`}
         >
           <Shield className="h-5 w-5 mb-0.5" />
-          <span>District</span>
+          <span>{t('District')}</span>
         </Link>
         <Link
           href="/map"
@@ -42,18 +44,18 @@ export function BottomNav() {
           }`}
         >
           <MapIcon className="h-5 w-5 mb-0.5" />
-          <span>Radar</span>
+          <span>{t('Radar')}</span>
         </Link>
       </div>
     );
   }
 
   const farmerNavItems = [
-    { href: `/farm/${user.farmId || DEMO_FARM_ID}`, label: 'Health', icon: Home },
-    { href: '/diagnose', label: 'Diagnose', icon: Activity },
-    { href: '/map', label: 'Radar', icon: MapIcon },
-    { href: '/simulate', label: 'Simulator', icon: PlayCircle },
-    { href: '/assistant', label: 'Advisor', icon: MessageSquare },
+    { href: `/farm/${user.farmId || DEMO_FARM_ID}`, label: t('Farm Health'), icon: Home },
+    { href: '/diagnose', label: t('Diagnose'), icon: Activity },
+    { href: '/map', label: t('Risk Map'), icon: MapIcon },
+    { href: '/simulate', label: t('Simulator'), icon: PlayCircle },
+    { href: '/assistant', label: t('Advisor'), icon: MessageSquare },
   ];
 
   return (

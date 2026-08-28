@@ -14,11 +14,13 @@ import {
 import { Farm, Crop } from '@/types';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 export default function FarmsPage() {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { t } = useTranslation();
   const router = useRouter();
 
   // Quick Farm Creation Modal State
@@ -97,13 +99,13 @@ export default function FarmsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E3E1D9] pb-5">
         <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium mb-1">
-            FARMER WORKSPACE · PLOT SELECTION
+            {t('FARMER WORKSPACE · PLOT SELECTION')}
           </div>
           <h1 className="text-[28px] sm:text-[34px] font-normal text-[#14231C] tracking-tight">
-            Select a Monitored Farm
+            {t('Select a Monitored Farm')}
           </h1>
           <p className="text-[14px] text-[#5C6259] mt-0.5">
-            Choose an active agricultural plot to view real-time risk scores, weather, and spread simulations.
+            {t('Choose an active agricultural plot to view real-time risk scores, weather, and spread simulations.')}
           </p>
         </div>
 
@@ -112,7 +114,7 @@ export default function FarmsPage() {
           className="inline-flex items-center justify-center rounded-full bg-[#14231C] text-white hover:bg-[#23372E] px-5 py-2.5 text-[13px] font-medium transition-all"
         >
           <Plus className="h-3.5 w-3.5 mr-1.5" />
-          Register New Plot
+          {t('Register New Plot')}
         </button>
       </div>
 
@@ -148,23 +150,23 @@ export default function FarmsPage() {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                       isCritical ? 'bg-[#C13B3B] text-white' : 'bg-[#E3E1D9] text-[#5C6259]'
                     }`}>
-                      {riskValue}/100 {isCritical ? 'Critical' : 'Low'}
+                      {riskValue}/100 {isCritical ? t('Critical') : t('Low')}
                     </span>
                   </div>
 
                   <div className="p-3 bg-[#F5F4F0] rounded-xl border border-[#E3E1D9] text-[12px] text-[#5C6259] space-y-1">
-                    <p>Crop: <span className="text-[#14231C] font-medium">{farm.crop?.name || farm.crop_id}</span> ({farm.variety || 'Standard'})</p>
-                    <p>Area: <span className="text-[#14231C] font-medium">{farm.area_acres} Acres</span> · Sown {farm.sowing_date}</p>
+                    <p>{t('Crop:')} <span className="text-[#14231C] font-medium">{t(farm.crop?.name || farm.crop_id)}</span> ({farm.variety || 'Standard'})</p>
+                    <p>{t('Area:')} <span className="text-[#14231C] font-medium">{farm.area_acres} {t('Acres')}</span> · {t('Sown')} {farm.sowing_date}</p>
                   </div>
                 </div>
 
                 <div className="pt-3 border-t border-[#E3E1D9] flex items-center justify-between">
                   <Link href={`/diagnose?farm_id=${farm.id}`} className="text-[12px] text-[#5C6259] hover:text-[#14231C] transition-colors">
-                    AI Diagnose
+                    {t('AI Diagnosis')}
                   </Link>
                   <Link href={`/farm/${farm.id}`}>
                     <button className="inline-flex items-center rounded-full bg-[#14231C] text-white hover:bg-[#23372E] px-4 py-1.5 text-[12px] font-medium transition-all group">
-                      <span>Open Health</span>
+                      <span>{t('Open Health')}</span>
                       <ArrowRight className="w-3 h-3 ml-1.5" />
                     </button>
                   </Link>
@@ -180,13 +182,13 @@ export default function FarmsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#14231C]/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-md bg-white rounded-[24px] border border-[#E3E1D9] p-7 space-y-5 shadow-sm">
             <div>
-              <h3 className="text-[20px] font-normal text-[#14231C]">Register New Farm</h3>
-              <p className="text-[13px] text-[#5C6259] mt-0.5">Enter plot details to initiate predictive risk monitoring.</p>
+              <h3 className="text-[20px] font-normal text-[#14231C]">{t('Register New Farm')}</h3>
+              <p className="text-[13px] text-[#5C6259] mt-0.5">{t('Enter plot details to initiate predictive risk monitoring.')}</p>
             </div>
             
             <form onSubmit={handleCreateFarm} className="space-y-4 text-[13px]">
               <div>
-                <label className="font-medium text-[#14231C] block mb-1">Farm Name</label>
+                <label className="font-medium text-[#14231C] block mb-1">{t('Farm Name')}</label>
                 <input
                   type="text"
                   required
@@ -198,19 +200,19 @@ export default function FarmsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-medium text-[#14231C] block mb-1">Crop Type</label>
+                  <label className="font-medium text-[#14231C] block mb-1">{t('Crop Type')}</label>
                   <select
                     value={newFarmCrop}
                     onChange={(e) => setNewFarmCrop(e.target.value)}
                     className="w-full px-3.5 py-2.5 border border-[#E3E1D9] rounded-xl text-[13px] focus:outline-none focus:border-[#14231C] bg-[#F5F4F0]"
                   >
                     {crops.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id}>{t(c.name)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="font-medium text-[#14231C] block mb-1">Area (Acres)</label>
+                  <label className="font-medium text-[#14231C] block mb-1">{t('Area (Acres)')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -222,7 +224,7 @@ export default function FarmsPage() {
                 </div>
               </div>
               <div>
-                <label className="font-medium text-[#14231C] block mb-1">Sowing Date</label>
+                <label className="font-medium text-[#14231C] block mb-1">{t('Sowing Date')}</label>
                 <input
                   type="date"
                   required
@@ -238,14 +240,14 @@ export default function FarmsPage() {
                   onClick={() => setShowCreateModal(false)}
                   className="rounded-full px-4 py-2 text-[13px] text-[#5C6259] hover:text-[#14231C]"
                 >
-                  Cancel
+                  {t('Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
                   className="rounded-full bg-[#14231C] text-white px-5 py-2 text-[13px] font-medium hover:bg-[#23372E] disabled:opacity-50"
                 >
-                  {creating ? 'Saving...' : 'Create Farm'}
+                  {creating ? t('Analyzing...') : t('Create Farm')}
                 </button>
               </div>
             </form>

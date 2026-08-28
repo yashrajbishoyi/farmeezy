@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { DiseaseReport, OutbreakCluster, Farm } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { ShieldAlert, MapPin, Activity, Info } from 'lucide-react';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 // Dynamically import react-leaflet components with ssr: false
 const MapContainer = dynamic(
@@ -47,6 +48,7 @@ export function DiseaseMap({
   clusters = [],
   selectedFarmId,
 }: DiseaseMapProps) {
+  const { t } = useTranslation();
   const [leafletReady, setLeafletReady] = useState(false);
   const [L, setL] = useState<any>(null);
 
@@ -60,7 +62,7 @@ export function DiseaseMap({
   if (!leafletReady || !L) {
     return (
       <div className="h-[550px] w-full bg-slate-100 rounded-xl flex items-center justify-center text-xs text-slate-500 animate-pulse">
-        Initializing Geospatial Map Layer...
+        {t('Initializing Geospatial Map Layer...')}
       </div>
     );
   }
@@ -122,14 +124,14 @@ export function DiseaseMap({
                 <div className="p-1 space-y-1.5 text-xs">
                   <div className="flex items-center gap-1.5 font-bold text-rose-700">
                     <ShieldAlert className="h-4 w-4" />
-                    <span>Outbreak Cluster ({cluster.risk_level.toUpperCase()})</span>
+                    <span>{t('Active Outbreaks')} ({cluster.risk_level.toUpperCase()})</span>
                   </div>
-                  <p className="text-slate-800 font-semibold">{cluster.disease_name}</p>
+                  <p className="text-slate-800 font-semibold">{t(cluster.disease_name)}</p>
                   <p className="text-slate-600">
-                    <strong>{cluster.report_count} Reports</strong> clustered within {cluster.radius_km} km
+                    <strong>{cluster.report_count} {t('Reports')}</strong> clustered within {cluster.radius_km} km
                   </p>
                   <span className="inline-block text-[10px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">
-                    Trajectory: {cluster.growth_rate.toUpperCase()}
+                    {t('Spread')}: {cluster.growth_rate.toUpperCase()}
                   </span>
                 </div>
               </Popup>
@@ -148,7 +150,7 @@ export function DiseaseMap({
               <div className="p-1 space-y-1.5 text-xs max-w-[220px]">
                 <div className="flex items-center justify-between">
                   <strong className="text-slate-900 capitalize font-bold">
-                    {report.disease?.name || report.disease_id.replace(/_/g, ' ')}
+                    {t(report.disease?.name || report.disease_id.replace(/_/g, ' '))}
                   </strong>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
                     report.severity === 'critical' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
@@ -157,14 +159,14 @@ export function DiseaseMap({
                   </span>
                 </div>
                 <p className="text-slate-600 text-[11px]">
-                  Confidence: <strong>{Math.round(report.confidence * 100)}%</strong>
+                  {t('Confidence')}: <strong>{Math.round(report.confidence * 100)}%</strong>
                 </p>
                 <p className="text-[10px] text-slate-400">
-                  Reported: {new Date(report.reported_at).toLocaleDateString('en-IN')}
+                  {new Date(report.reported_at).toLocaleDateString('en-IN')}
                 </p>
                 {report.is_simulated && (
                   <span className="text-[9px] text-slate-400 italic block">
-                    * Simulated regional surveillance data
+                    * {t('Live Demo')}
                   </span>
                 )}
               </div>
@@ -188,14 +190,14 @@ export function DiseaseMap({
                     <span>{farm.name}</span>
                   </div>
                   <p className="text-slate-600">
-                    {farm.crop?.name || farm.crop_id} · {farm.area_acres} Acres
+                    {t(farm.crop?.name || farm.crop_id)} · {farm.area_acres} {t('Acres')}
                   </p>
                   <p className="text-[10px] text-slate-500">
-                    Sowing: {farm.sowing_date}
+                    {t('Sown')}: {farm.sowing_date}
                   </p>
                   {isPrimary && (
                     <span className="inline-block text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold">
-                      Your Active Farm
+                      {t('Your Active Farm')}
                     </span>
                   )}
                 </div>
@@ -207,23 +209,23 @@ export function DiseaseMap({
 
       {/* Floating Legend Overlay */}
       <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur p-3 rounded-lg shadow-lg border border-slate-200 text-xs space-y-2 max-w-xs">
-        <span className="font-bold text-slate-800 block text-[11px] uppercase tracking-wider">Map Legend</span>
+        <span className="font-bold text-slate-800 block text-[11px] uppercase tracking-wider">{t('Map Legend')}</span>
         <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-3 rounded-full bg-emerald-700 inline-block" />
-            <span>Monitored Farm</span>
+            <span>{t('Monitored Farm')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-3 rounded-full bg-rose-600 inline-block" />
-            <span>Critical Disease Case</span>
+            <span>{t('Critical Disease Case')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-3 rounded-full bg-orange-500 inline-block" />
-            <span>High/Moderate Case</span>
+            <span>{t('High/Moderate Case')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="h-3 w-3 rounded border border-rose-500 bg-rose-100/60 inline-block" />
-            <span>DBSCAN Outbreak Zone</span>
+            <span>{t('DBSCAN Outbreak Zone')}</span>
           </div>
         </div>
       </div>

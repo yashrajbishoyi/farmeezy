@@ -6,10 +6,13 @@ import { usePathname } from 'next/navigation';
 import { Sprout, ArrowRight, LogOut } from 'lucide-react';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { useAuth } from '@/lib/context/AuthContext';
+import { useTranslation } from '@/lib/context/LanguageContext';
+import { LanguageSelector } from '@/components/layout/LanguageSelector';
 
 export function Navbar() {
   const pathname = usePathname();
   const { user, logout, isLoading } = useAuth();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -21,16 +24,16 @@ export function Navbar() {
   const showAuthLinks = mounted && !isLoading && user && !isLandingPage;
 
   const farmerLinks = [
-    { href: `/farm/${user?.farmId || DEMO_FARM_ID}`, label: 'Farm Health' },
-    { href: '/diagnose', label: 'Diagnose' },
-    { href: '/map', label: 'Risk Map' },
-    { href: '/simulate', label: 'Simulator' },
-    { href: '/assistant', label: 'Advisor' },
+    { href: `/farm/${user?.farmId || DEMO_FARM_ID}`, label: t('Farm Health') },
+    { href: '/diagnose', label: t('Diagnose') },
+    { href: '/map', label: t('Risk Map') },
+    { href: '/simulate', label: t('Simulator') },
+    { href: '/assistant', label: t('Advisor') },
   ];
 
   const officerLinks = [
-    { href: '/officer', label: 'District Portal' },
-    { href: '/map', label: 'Surveillance Radar' },
+    { href: '/officer', label: t('District Portal') },
+    { href: '/map', label: t('Surveillance Radar') },
   ];
 
   return (
@@ -85,12 +88,14 @@ export function Navbar() {
           </nav>
         )}
 
-        {/* Right Action: Sign In Pill OR Logged-in Profile + Logout */}
-        <div className="flex items-center gap-3">
+        {/* Right Action: Language Selector + Sign In Pill OR Logged-in Profile + Logout */}
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {mounted && <LanguageSelector />}
+
           {(!mounted || isLoading || !user || isLandingPage) ? (
             <Link href="/login">
               <button className="inline-flex items-center justify-center rounded-full bg-[#14231C] text-[#F5F4F0] hover:bg-[#23372E] px-5 py-2 text-[13px] font-medium transition-all group shadow-none">
-                <span>Sign In</span>
+                <span>{t('Sign In')}</span>
                 <span className="w-4 h-4 rounded-full bg-white/15 group-hover:bg-white/25 transition-colors flex items-center justify-center ml-2 shrink-0">
                   <ArrowRight className="w-2.5 h-2.5 text-[#F5F4F0]" />
                 </span>
@@ -101,12 +106,12 @@ export function Navbar() {
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#E3E1D9] bg-white text-[12px] text-[#14231C]">
                 <span className="w-2 h-2 rounded-full bg-[#2F9E5C]" />
                 <span className="font-medium">{user.name}</span>
-                <span className="text-[#5C6259]">({user.role === 'farmer' ? 'Farmer' : 'Officer'})</span>
+                <span className="text-[#5C6259]">({user.role === 'farmer' ? t('Farmer') : t('Officer')})</span>
               </div>
               
               <button
                 onClick={logout}
-                title="Sign Out"
+                title={t('Sign Out')}
                 className="w-8 h-8 rounded-full border border-[#E3E1D9] bg-white flex items-center justify-center text-[#5C6259] hover:text-[#14231C] hover:bg-[#F5F4F0] transition-colors"
               >
                 <LogOut className="h-3.5 w-3.5" />

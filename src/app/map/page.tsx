@@ -12,10 +12,12 @@ import {
 import { Farm, DiseaseReport, OutbreakCluster, Disease } from '@/types';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { CountUp } from '@/components/react-bits/CountUp';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 function MapViewContent() {
   const searchParams = useSearchParams();
   const initialFarmId = searchParams.get('farm_id') || DEMO_FARM_ID;
+  const { t } = useTranslation();
 
   const [farms, setFarms] = useState<Farm[]>([]);
   const [reports, setReports] = useState<DiseaseReport[]>([]);
@@ -68,10 +70,10 @@ function MapViewContent() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E3E1D9] pb-4">
         <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium mb-1">
-            GEOSPATIAL SURVEILLANCE RADAR
+            {t('GEOSPATIAL SURVEILLANCE RADAR')}
           </div>
           <h1 className="text-[28px] sm:text-[32px] font-normal text-[#14231C] tracking-tight">
-            Regional Outbreak Radar
+            {t('Regional Outbreak Radar')}
           </h1>
         </div>
 
@@ -80,7 +82,7 @@ function MapViewContent() {
           className="inline-flex items-center rounded-full bg-white border border-[#E3E1D9] text-[#14231C] hover:bg-[#F5F4F0] px-4 py-2 text-[13px] font-medium transition-all"
         >
           <RefreshCw className={`h-3.5 w-3.5 mr-1.5 text-[#5C6259] ${loading ? 'animate-spin' : ''}`} />
-          Refresh Radar
+          {t('Refresh Radar')}
         </button>
       </div>
 
@@ -88,35 +90,35 @@ function MapViewContent() {
       <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-[13px]">
           <div>
-            <label className="font-medium text-[#14231C] block mb-1.5">Center on Farm</label>
+            <label className="font-medium text-[#14231C] block mb-1.5">{t('Center on Farm')}</label>
             <select
               value={selectedFarmId}
               onChange={(e) => setSelectedFarmId(e.target.value)}
               className="w-full px-3.5 py-2 border border-[#E3E1D9] rounded-xl bg-[#F5F4F0] font-medium text-[#14231C] focus:outline-none focus:border-[#14231C]"
             >
               {farms.map(f => (
-                <option key={f.id} value={f.id}>{f.name} ({f.crop?.name || f.crop_id})</option>
+                <option key={f.id} value={f.id}>{f.name} ({t(f.crop?.name || f.crop_id)})</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="font-medium text-[#14231C] block mb-1.5">Filter Pathogen</label>
+            <label className="font-medium text-[#14231C] block mb-1.5">{t('Filter Pathogen')}</label>
             <select
               value={selectedDisease}
               onChange={(e) => setSelectedDisease(e.target.value)}
               className="w-full px-3.5 py-2 border border-[#E3E1D9] rounded-xl bg-[#F5F4F0] font-medium text-[#14231C] focus:outline-none focus:border-[#14231C]"
             >
-              <option value="all">All Pathogens (Full Radar)</option>
+              <option value="all">{t('All Pathogens (Full Radar)')}</option>
               {diseases.map(d => (
-                <option key={d.id} value={d.id}>{d.name}</option>
+                <option key={d.id} value={d.id}>{t(d.name)}</option>
               ))}
             </select>
           </div>
 
           <div>
             <div className="flex justify-between font-medium text-[#14231C] mb-1.5">
-              <span>Radius Window</span>
+              <span>{t('Radius Window')}</span>
               <span className="tabular-nums">{selectedRadius} km</span>
             </div>
             <input
@@ -150,10 +152,10 @@ function MapViewContent() {
         <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-3">
           <div>
             <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
-              DBSCAN SPATIAL-TEMPORAL CLUSTERING
+              {t('DBSCAN SPATIAL-TEMPORAL CLUSTERING')}
             </span>
             <h3 className="text-[20px] font-normal text-[#14231C] mt-0.5">
-              Active Outbreak Clusters ({clusters.length})
+              {t('Active Outbreak Clusters')} ({clusters.length})
             </h3>
           </div>
           <span className="text-[12px] text-[#5C6259]">Rule: &ge;3 cases · &le;5km · &le;7 days</span>
@@ -161,7 +163,7 @@ function MapViewContent() {
 
         {clusters.length === 0 ? (
           <p className="text-[13px] text-[#5C6259] italic p-6 bg-white rounded-[22px] border border-[#E3E1D9]">
-            No active outbreak clusters detected within the current surveillance window.
+            {t('No active outbreak clusters detected within the current surveillance window.')}
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -173,37 +175,37 @@ function MapViewContent() {
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-medium text-[#5C6259] uppercase tracking-wider block">
-                      Cluster {cluster.cluster_id}
+                      {t('Cluster')} {cluster.cluster_id}
                     </span>
                     <h4 className="text-[18px] font-normal text-[#14231C] mt-0.5">
-                      {cluster.disease_name}
+                      {t(cluster.disease_name)}
                     </h4>
                   </div>
                   <span className="px-3 py-0.5 rounded-full text-[11px] font-medium bg-[#C13B3B] text-white">
-                    {cluster.risk_level.toUpperCase()}
+                    {t(cluster.risk_level.toUpperCase())}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 text-center text-[13px]">
                   <div className="bg-[#F5F4F0] p-3 rounded-xl border border-[#E3E1D9]">
-                    <span className="text-[10px] text-[#5C6259] block uppercase">Reports</span>
+                    <span className="text-[10px] text-[#5C6259] block uppercase">{t('Reports')}</span>
                     <strong className="text-[18px] font-semibold text-[#14231C] tabular-nums">
                       <CountUp to={cluster.report_count} duration={0.8} />
                     </strong>
                   </div>
                   <div className="bg-[#F5F4F0] p-3 rounded-xl border border-[#E3E1D9]">
-                    <span className="text-[10px] text-[#5C6259] block uppercase">Radius</span>
+                    <span className="text-[10px] text-[#5C6259] block uppercase">{t('Radius')}</span>
                     <strong className="text-[18px] font-semibold text-[#14231C] tabular-nums">{cluster.radius_km} km</strong>
                   </div>
                   <div className="bg-[#F5F4F0] p-3 rounded-xl border border-[#E3E1D9]">
-                    <span className="text-[10px] text-[#5C6259] block uppercase">Spread</span>
+                    <span className="text-[10px] text-[#5C6259] block uppercase">{t('Spread')}</span>
                     <strong className="text-[13px] font-semibold text-[#C13B3B] uppercase mt-1 block">{cluster.growth_rate}</strong>
                   </div>
                 </div>
 
                 <div className="text-[12px] text-[#5C6259] flex items-center justify-between pt-2 border-t border-[#E3E1D9]">
-                  <span>Centroid: {cluster.center.lat.toFixed(3)}, {cluster.center.lng.toFixed(3)}</span>
-                  <span className="text-[#C13B3B] font-medium">Acute Area Threat</span>
+                  <span>{t('Centroid:')} {cluster.center.lat.toFixed(3)}, {cluster.center.lng.toFixed(3)}</span>
+                  <span className="text-[#C13B3B] font-medium">{t('Acute Area Threat')}</span>
                 </div>
               </div>
             ))}
@@ -215,8 +217,9 @@ function MapViewContent() {
 }
 
 export default function MapPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="max-w-5xl mx-auto p-12 text-center text-[13px] text-[#5C6259]">Loading surveillance radar...</div>}>
+    <Suspense fallback={<div className="max-w-5xl mx-auto p-12 text-center text-[13px] text-[#5C6259]">{t('Loading surveillance radar...')}</div>}>
       <MapViewContent />
     </Suspense>
   );

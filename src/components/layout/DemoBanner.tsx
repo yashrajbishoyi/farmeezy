@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 export function DemoBanner() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -28,10 +30,10 @@ export function DemoBanner() {
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#2F9E5C]" />
           <span>
-            <strong>SIH 2026 Live Prototype:</strong> Active Odisha Rice scenario loaded (Rice Blast · 81/100 Risk).
+            <strong>{t('SIH 2026 Live Prototype:')}</strong> {t('Active Odisha Rice scenario loaded (Rice Blast · 81/100 Risk).')}
           </span>
           <Link href={`/farm/${DEMO_FARM_ID}`} className="underline text-white/80 hover:text-white ml-1.5 hidden sm:inline">
-            View Live Farm →
+            {t('View Live Farm →')}
           </Link>
         </div>
         <button

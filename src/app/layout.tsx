@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { DemoBanner } from '@/components/layout/DemoBanner';
 import { AuthProvider } from '@/lib/context/AuthContext';
+import { LanguageProvider } from '@/lib/context/LanguageContext';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -44,13 +45,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#F5F4F0] text-[#14231C] font-sans antialiased flex flex-col selection:bg-[#1F3A2E] selection:text-white pb-16 md:pb-0">
         <AuthProvider>
-          <DemoBanner />
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-          <BottomNav />
+          <LanguageProvider>
+            <DemoBanner />
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+            <BottomNav />
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

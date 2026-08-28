@@ -21,6 +21,7 @@ import { Farm, DiagnosisOutputContract } from '@/types';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { CountUp } from '@/components/react-bits/CountUp';
 import { FadeContent } from '@/components/react-bits/FadeContent';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 const DEMO_SAMPLES = [
   {
@@ -61,6 +62,7 @@ function DiagnoseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const targetFarmId = searchParams.get('farm_id') || DEMO_FARM_ID;
+  const { t } = useTranslation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [farms, setFarms] = useState<Farm[]>([]);
@@ -181,15 +183,15 @@ function DiagnoseContent() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E3E1D9] pb-4">
         <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium mb-1">
-            MULTIMODAL PATHOLOGY ANALYSIS
+            {t('MULTIMODAL PATHOLOGY ANALYSIS')}
           </div>
           <h1 className="text-[28px] sm:text-[32px] font-normal text-[#14231C] tracking-tight">
-            Diagnose
+            {t('Diagnose')}
           </h1>
         </div>
 
         <div className="flex items-center gap-2 text-[13px]">
-          <span className="text-[#5C6259]">Target Plot:</span>
+          <span className="text-[#5C6259]">{t('Target Plot:')}</span>
           <select
             value={selectedFarmId}
             onChange={(e) => setSelectedFarmId(e.target.value)}
@@ -197,7 +199,7 @@ function DiagnoseContent() {
           >
             {farms.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} ({f.crop?.name || f.crop_id})
+                {f.name} ({t(f.crop?.name || f.crop_id)})
               </option>
             ))}
           </select>
@@ -209,7 +211,7 @@ function DiagnoseContent() {
         <div className="lg:col-span-5 space-y-6">
           <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6 space-y-5">
             <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-3">
-              <span className="text-[13px] font-medium text-[#14231C]">1. Crop Foliage Photo</span>
+              <span className="text-[13px] font-medium text-[#14231C]">{t('1. Crop Foliage Photo')}</span>
               <span className="text-[11px] text-[#5C6259]">JPG, PNG &lt; 8MB</span>
             </div>
 
@@ -235,9 +237,9 @@ function DiagnoseContent() {
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-black/65 backdrop-blur-sm px-3.5 py-2 rounded-xl text-white text-[11px]">
                 <div className="flex items-center gap-1.5 truncate">
                   <Camera className="w-3.5 h-3.5 text-[#2F9E5C] shrink-0" />
-                  <span className="truncate">Crop Foliage Preview · Click to Replace</span>
+                  <span className="truncate">{t('Crop Foliage Preview · Click to Replace')}</span>
                 </div>
-                <span className="text-white/70 text-[10px] shrink-0">Upload</span>
+                <span className="text-white/70 text-[10px] shrink-0">{t('Upload')}</span>
               </div>
             </div>
 
@@ -255,7 +257,7 @@ function DiagnoseContent() {
                 className="flex-1 rounded-full border border-[#E3E1D9] bg-white text-[#14231C] hover:bg-[#F5F4F0] py-2.5 text-[13px] font-medium transition-colors"
                 onClick={() => fileInputRef.current?.click()}
               >
-                Browse File
+                {t('Browse File')}
               </button>
 
               <button
@@ -264,7 +266,7 @@ function DiagnoseContent() {
                 onClick={runDiagnosis}
                 className="flex-1 rounded-full bg-[#14231C] text-white hover:bg-[#23372E] py-2.5 text-[13px] font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                <span>{analyzing ? 'Analyzing...' : 'Run Diagnosis'}</span>
+                <span>{analyzing ? t('Analyzing...') : t('Run Diagnosis')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -300,7 +302,7 @@ function DiagnoseContent() {
           {/* Quick Demo Sample Selector */}
           <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6 space-y-3">
             <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
-              Or Select Demo Benchmark Samples:
+              {t('Or Select Demo Benchmark Samples:')}
             </span>
             <div className="space-y-2">
               {DEMO_SAMPLES.map((sample) => (
@@ -314,13 +316,13 @@ function DiagnoseContent() {
                   }`}
                 >
                   <div>
-                    <strong className="block text-[13px] text-[#14231C] font-medium">{sample.title}</strong>
+                    <strong className="block text-[13px] text-[#14231C] font-medium">{t(sample.title)}</strong>
                     <span className="text-[11px] text-[#5C6259] block truncate max-w-[200px]">
                       {sample.description}
                     </span>
                   </div>
                   <span className="text-[10px] text-[#5C6259] px-2 py-0.5 rounded-full border border-[#E3E1D9] uppercase">
-                    {sample.crop}
+                    {t(sample.crop)}
                   </span>
                 </div>
               ))}
@@ -337,38 +339,38 @@ function DiagnoseContent() {
                 <div className="flex items-start justify-between border-b border-[#E3E1D9] pb-4">
                   <div>
                     <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
-                      STRUCTURED DIAGNOSIS
+                      {t('STRUCTURED DIAGNOSIS')}
                     </span>
                     <h2 className="text-[24px] font-normal text-[#14231C] mt-1 capitalize">
-                      {result.primary_disease.replace(/_/g, ' ')}
+                      {t(result.primary_disease.replace(/_/g, ' '))}
                     </h2>
                   </div>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium ${
                     result.severity === 'high' || result.severity === 'critical' ? 'bg-[#C13B3B] text-white' : 'bg-[#E3E1D9] text-[#5C6259]'
                   }`}>
-                    {result.severity.toUpperCase()} SEVERITY
+                    {t(result.severity.toUpperCase())} {t('SEVERITY')}
                   </span>
                 </div>
 
                 {/* Confidence & Quality Metrics */}
                 <div className="grid grid-cols-2 gap-4 text-[13px]">
                   <div className="p-4 rounded-xl bg-[#F5F4F0] border border-[#E3E1D9] space-y-1">
-                    <span className="text-[11px] text-[#5C6259] block">Self-Assessed Confidence</span>
+                    <span className="text-[11px] text-[#5C6259] block">{t('Self-Assessed Confidence')}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-[28px] font-semibold text-[#14231C] tabular-nums">
                         <CountUp to={Math.round(result.confidence * 100)} duration={0.8} suffix="%" />
                       </span>
-                      <span className="text-[11px] text-[#5C6259]">certainty</span>
+                      <span className="text-[11px] text-[#5C6259]">{t('certainty')}</span>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl bg-[#F5F4F0] border border-[#E3E1D9] space-y-1">
-                    <span className="text-[11px] text-[#5C6259] block">Image Quality Score</span>
+                    <span className="text-[11px] text-[#5C6259] block">{t('Image Quality Score')}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-[28px] font-semibold text-[#14231C] tabular-nums">
                         <CountUp to={Math.round(result.image_quality * 100)} duration={0.8} suffix="%" />
                       </span>
-                      <span className="text-[11px] text-[#5C6259]">resolution</span>
+                      <span className="text-[11px] text-[#5C6259]">{t('resolution')}</span>
                     </div>
                   </div>
                 </div>
@@ -376,7 +378,7 @@ function DiagnoseContent() {
                 {/* Visual Evidence */}
                 <div className="p-4 rounded-xl bg-[#F5F4F0] border border-[#E3E1D9] space-y-2">
                   <span className="text-[12px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
-                    Visual Morphological Evidence:
+                    {t('Visual Morphological Evidence:')}
                   </span>
                   <ul className="space-y-1.5 text-[13px] text-[#14231C]">
                     {result.visual_evidence.map((evidence, idx) => (
@@ -392,16 +394,16 @@ function DiagnoseContent() {
                 {result.alternative_diagnoses && result.alternative_diagnoses.length > 0 && (
                   <div className="space-y-2.5 pt-2">
                     <span className="text-[12px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
-                      Differential Diagnoses (Weighted):
+                      {t('Differential Diagnoses (Weighted):')}
                     </span>
                     <div className="space-y-2">
                       {result.alternative_diagnoses.map((alt) => (
                         <div key={alt.disease} className="p-3 rounded-xl border border-[#E3E1D9] bg-white flex items-center justify-between text-[13px]">
                           <span className="font-medium text-[#14231C] capitalize">
-                            {alt.disease_name || alt.disease.replace(/_/g, ' ')}
+                            {t(alt.disease_name || alt.disease.replace(/_/g, ' '))}
                           </span>
                           <span className="text-[#5C6259] tabular-nums">
-                            {Math.round(alt.confidence * 100)}% Probability
+                            {Math.round(alt.confidence * 100)}% {t('Probability')}
                           </span>
                         </div>
                       ))}
@@ -413,7 +415,7 @@ function DiagnoseContent() {
                 <div className="pt-2">
                   <Link href={`/farm/${selectedFarmId}`}>
                     <button className="w-full rounded-full bg-[#14231C] text-white hover:bg-[#23372E] py-3 text-[14px] font-medium transition-all flex items-center justify-center gap-2 group">
-                      <span>Update Farm Risk Score & View Simulation</span>
+                      <span>{t('Update Farm Risk Score & View Simulation')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </Link>
@@ -425,9 +427,9 @@ function DiagnoseContent() {
               <div className="w-12 h-12 rounded-full bg-[#F5F4F0] border border-[#E3E1D9] flex items-center justify-center text-[#5C6259]">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <h3 className="text-[20px] font-normal text-[#14231C]">Ready for Multimodal Diagnosis</h3>
+              <h3 className="text-[20px] font-normal text-[#14231C]">{t('Ready for Multimodal Diagnosis')}</h3>
               <p className="text-[13px] text-[#5C6259] max-w-sm">
-                Select a benchmark sample or upload a photo, then click <strong>Run Diagnosis</strong>.
+                {t('Select a benchmark sample or upload a photo, then click')} <strong>{t('Run Diagnosis')}</strong>.
               </p>
             </div>
           )}
@@ -438,8 +440,9 @@ function DiagnoseContent() {
 }
 
 export default function DiagnosePage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="max-w-5xl mx-auto p-12 text-center text-[13px] text-[#5C6259]">Loading diagnostic interface...</div>}>
+    <Suspense fallback={<div className="max-w-5xl mx-auto p-12 text-center text-[13px] text-[#5C6259]">{t('Loading diagnostic interface...')}</div>}>
       <DiagnoseContent />
     </Suspense>
   );

@@ -42,6 +42,7 @@ import { CountUp } from '@/components/react-bits/CountUp';
 import { Stepper, StepItem } from '@/components/react-bits/Stepper';
 import { AnimatedList } from '@/components/react-bits/AnimatedList';
 import { FadeContent } from '@/components/react-bits/FadeContent';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 type TabKey = 'overview' | 'factors' | 'weather' | 'simulation' | 'history';
 
@@ -49,6 +50,7 @@ export default function FarmDetailPage() {
   const params = useParams();
   const farmId = params?.id as string;
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [loading, setLoading] = useState(true);
@@ -130,10 +132,10 @@ export default function FarmDetailPage() {
   if (!data || !data.farm) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 text-center space-y-4">
-        <h2 className="text-[24px] font-normal text-[#14231C]">Farm Not Found</h2>
-        <p className="text-[14px] text-[#5C6259]">The requested farm identifier does not exist.</p>
+        <h2 className="text-[24px] font-normal text-[#14231C]">{t('Farm Not Found')}</h2>
+        <p className="text-[14px] text-[#5C6259]">{t('The requested farm identifier does not exist.')}</p>
         <Link href="/">
-          <Button variant="default">Return to Home</Button>
+          <Button variant="default">{t('Return to Home')}</Button>
         </Link>
       </div>
     );
@@ -169,17 +171,17 @@ export default function FarmDetailPage() {
   const activeStepIdx = currentStageIndex === -1 ? stages.length - 1 : currentStageIndex;
 
   const stepperItems: StepItem[] = stages.map((st) => ({
-    title: st.stage,
-    subtitle: `Days ${st.days_start}–${st.days_end}`,
-    meta: `${Math.round(st.susceptibility * 100)}% Vuln`,
+    title: t(st.stage),
+    subtitle: `${t('Day')} ${st.days_start}–${st.days_end}`,
+    meta: `${Math.round(st.susceptibility * 100)}% ${t('Vuln')}`,
   }));
 
   const tabs: { id: TabKey; label: string; badge?: string }[] = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'factors', label: 'Risk Factors', badge: `${riskPrediction.factors_json.length}` },
-    { id: 'weather', label: 'Weather & Forecast', badge: `${weather.current.humidity}% Hum` },
-    { id: 'simulation', label: 'Simulation & Economics' },
-    { id: 'history', label: 'History & Alerts', badge: alerts.length > 0 ? `${alerts.length}` : undefined },
+    { id: 'overview', label: t('Overview') },
+    { id: 'factors', label: t('Risk Factors'), badge: `${riskPrediction.factors_json.length}` },
+    { id: 'weather', label: t('Weather & Forecast'), badge: `${weather.current.humidity}% Hum` },
+    { id: 'simulation', label: t('Simulation & Economics') },
+    { id: 'history', label: t('History & Alerts'), badge: alerts.length > 0 ? `${alerts.length}` : undefined },
   ];
 
   return (
@@ -192,7 +194,7 @@ export default function FarmDetailPage() {
           {/* Plot Dropdown */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium whitespace-nowrap">
-              Plot:
+              {t('Plot:')}
             </span>
             <select
               value={farm.id}
@@ -204,7 +206,7 @@ export default function FarmDetailPage() {
             >
               {allFarms.map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name} ({f.crop?.name || f.crop_id})
+                  {f.name} ({t(f.crop?.name || f.crop_id)})
                 </option>
               ))}
             </select>
@@ -213,7 +215,7 @@ export default function FarmDetailPage() {
           {/* Threat / Pathogen Dropdown (Side by Side) */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium whitespace-nowrap">
-              Threat:
+              {t('Threat:')}
             </span>
             <select
               value={disease.id}
@@ -226,7 +228,7 @@ export default function FarmDetailPage() {
             >
               {(availableDiseases.length > 0 ? availableDiseases : [disease]).map((d) => (
                 <option key={d.id} value={d.id}>
-                  {d.name} ({d.category})
+                  {t(d.name)} ({d.category})
                 </option>
               ))}
             </select>
@@ -238,7 +240,7 @@ export default function FarmDetailPage() {
         <div className="flex items-center gap-2">
           <button 
             onClick={() => loadFarmData()} 
-            title="Refresh Telemetry" 
+            title={t('Refresh Telemetry')} 
             className="w-8 h-8 rounded-full border border-[#E3E1D9] bg-[#F5F4F0] hover:bg-[#EAE8E2] flex items-center justify-center text-[#5C6259] hover:text-[#14231C] transition-colors"
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -252,21 +254,21 @@ export default function FarmDetailPage() {
           <h1 className="text-[26px] sm:text-[32px] font-normal tracking-tight text-[#14231C]">{farm.name}</h1>
           {isDemo && (
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#F5F4F0] text-[#14231C] border border-[#E3E1D9]">
-              Demo Scenario
+              {t('Demo Scenario')}
             </span>
           )}
           <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#1F3A2E] text-white">
-            Active Pathogen: {disease.name}
+            {t('Active Pathogen:')} {t(disease.name)}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-[#5C6259]">
-          <span>Crop: <strong className="text-[#14231C] font-medium">{farm.crop?.name || farm.crop_id}</strong> ({farm.variety || 'Standard'})</span>
+          <span>{t('Crop:')} <strong className="text-[#14231C] font-medium">{t(farm.crop?.name || farm.crop_id)}</strong> ({farm.variety || 'Standard'})</span>
           <span>·</span>
-          <span>Area: <strong className="text-[#14231C] font-medium">{farm.area_acres} Acres</strong></span>
+          <span>{t('Area:')} <strong className="text-[#14231C] font-medium">{farm.area_acres} {t('Acres')}</strong></span>
           <span>·</span>
-          <span>Sown {farm.sowing_date} (Day {daysSinceSowing})</span>
+          <span>{t('Sown')} {farm.sowing_date} ({t('Day')} {daysSinceSowing})</span>
           <span>·</span>
-          <span>Location: {farm.lat.toFixed(3)}°N, {farm.lng.toFixed(3)}°E</span>
+          <span>{t('Location:')} {farm.lat.toFixed(3)}°N, {farm.lng.toFixed(3)}°E</span>
         </div>
       </div>
 
@@ -307,11 +309,11 @@ export default function FarmDetailPage() {
             {/* 1. Risk Score */}
             <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">1. Pathogen Risk</span>
+                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">{t('1. Pathogen Risk')}</span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
                   isCritical ? 'bg-[#C13B3B] text-white' : 'bg-[#E3E1D9] text-[#5C6259]'
                 }`}>
-                  {riskPrediction.risk_level.toUpperCase()}
+                  {t(riskPrediction.risk_level.toUpperCase())}
                 </span>
               </div>
               <div className="flex items-baseline gap-1.5 pt-1">
@@ -321,14 +323,14 @@ export default function FarmDetailPage() {
                 <span className="text-[14px] text-[#5C6259]">/ 100</span>
               </div>
               <p className="text-[13px] text-[#5C6259] truncate pt-1 border-t border-[#E3E1D9]">
-                Threat: <strong className="text-[#14231C] font-medium">{disease?.name || 'Pathogen'}</strong>
+                {t('Threat:')} <strong className="text-[#14231C] font-medium">{t(disease?.name || 'Pathogen')}</strong>
               </p>
             </div>
 
             {/* 2. Microclimate */}
             <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">2. Humidity & Rain</span>
+                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">{t('2. Humidity & Rain')}</span>
                 <CloudRain className="h-4 w-4 text-[#5C6259]" />
               </div>
               <div className="flex items-baseline gap-1.5 pt-1">
@@ -338,14 +340,14 @@ export default function FarmDetailPage() {
                 <span className="text-[14px] text-[#5C6259]">· {weather.current.temperature.toFixed(0)}°C</span>
               </div>
               <p className="text-[13px] text-[#5C6259] truncate pt-1 border-t border-[#E3E1D9]">
-                {weather.current.rainfall} mm rain · {weather.current.humidity >= 80 ? 'Spore Favorable' : 'Normal'}
+                {weather.current.rainfall} {t('mm rain')} · {weather.current.humidity >= 80 ? t('Spore Favorable') : t('Normal Conditions')}
               </p>
             </div>
 
             {/* 3. Avoidable Economic Loss */}
             <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-6 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">3. Net Benefit of Acting</span>
+                <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">{t('3. Net Benefit of Acting')}</span>
                 <DollarSign className="h-4 w-4 text-[#14231C]" />
               </div>
               <div className="flex items-baseline gap-1.5 pt-1">
@@ -354,7 +356,7 @@ export default function FarmDetailPage() {
                 </span>
               </div>
               <p className="text-[13px] text-[#5C6259] truncate pt-1 border-t border-[#E3E1D9]">
-                Protects yield · ROI: <span className="text-[#14231C] font-medium">{economicAnalysis?.roi_percentage || 0}%</span>
+                {t('Protects yield · ROI:')} <span className="text-[#14231C] font-medium">{economicAnalysis?.roi_percentage || 0}%</span>
               </p>
             </div>
           </div>
@@ -368,13 +370,13 @@ export default function FarmDetailPage() {
               <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-4">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium mb-0.5">
-                    PHENOLOGICAL TIMING
+                    {t('PHENOLOGICAL TIMING')}
                   </div>
-                  <h3 className="text-[20px] font-normal text-[#14231C]">Crop Growth Lifecycle</h3>
+                  <h3 className="text-[20px] font-normal text-[#14231C]">{t('Crop Growth Lifecycle')}</h3>
                 </div>
                 {growthStage && (
                   <span className="px-3 py-1 rounded-full text-[11px] font-medium bg-[#F5F4F0] text-[#14231C] border border-[#E3E1D9]">
-                    Active: {growthStage.stage}
+                    {t('Active:')} {t(growthStage.stage)}
                   </span>
                 )}
               </div>
@@ -390,25 +392,25 @@ export default function FarmDetailPage() {
             <Link href={`/diagnose?farm_id=${farm.id}`}>
               <button className="w-full rounded-full border border-[#E3E1D9] bg-white text-[#14231C] hover:bg-[#F5F4F0] p-3 text-[13px] font-medium transition-colors flex items-center justify-center gap-2">
                 <Activity className="h-3.5 w-3.5 text-[#14231C]" />
-                <span>AI Diagnosis</span>
+                <span>{t('AI Diagnosis')}</span>
               </button>
             </Link>
             <Link href={`/map?lat=${farm.lat}&lng=${farm.lng}&farm_id=${farm.id}`}>
               <button className="w-full rounded-full border border-[#E3E1D9] bg-white text-[#14231C] hover:bg-[#F5F4F0] p-3 text-[13px] font-medium transition-colors flex items-center justify-center gap-2">
                 <MapIcon className="h-3.5 w-3.5 text-[#14231C]" />
-                <span>Outbreak Map</span>
+                <span>{t('Outbreak Map')}</span>
               </button>
             </Link>
             <Link href={`/simulate?farm_id=${farm.id}`}>
               <button className="w-full rounded-full border border-[#E3E1D9] bg-white text-[#14231C] hover:bg-[#F5F4F0] p-3 text-[13px] font-medium transition-colors flex items-center justify-center gap-2">
                 <PlayCircle className="h-3.5 w-3.5 text-[#14231C]" />
-                <span>Spread Simulator</span>
+                <span>{t('Spread Simulator')}</span>
               </button>
             </Link>
             <Link href={`/assistant?farm_id=${farm.id}`}>
               <button className="w-full rounded-full border border-[#E3E1D9] bg-white text-[#14231C] hover:bg-[#F5F4F0] p-3 text-[13px] font-medium transition-colors flex items-center justify-center gap-2">
                 <MessageSquare className="h-3.5 w-3.5 text-[#14231C]" />
-                <span>AI Advisor</span>
+                <span>{t('AI Advisor')}</span>
               </button>
             </Link>
           </div>
@@ -440,30 +442,30 @@ export default function FarmDetailPage() {
             <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-7 space-y-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-3">
-                  <h3 className="text-[18px] font-normal text-[#14231C]">Spread Simulation Model</h3>
-                  <span className="text-[11px] text-[#5C6259]">Graph Contagion</span>
+                  <h3 className="text-[18px] font-normal text-[#14231C]">{t('Spread Simulator')}</h3>
+                  <span className="text-[11px] text-[#5C6259]">{t('Graph Contagion Simulation')}</span>
                 </div>
                 <p className="text-[13px] text-[#5C6259] mt-3">
-                  Comparing unchecked pathogen propagation against immediate bio-control containment:
+                  {t('Comparing unchecked pathogen propagation against immediate bio-control containment:')}
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 text-[13px] mt-4">
                   <div className="p-4 bg-[#F5F4F0] rounded-xl border border-[#E3E1D9] space-y-1">
-                    <span className="text-[11px] text-[#C13B3B] font-medium block uppercase">No Action</span>
+                    <span className="text-[11px] text-[#C13B3B] font-medium block uppercase">{t('No Action')}</span>
                     <span className="text-[20px] font-semibold text-[#14231C] tabular-nums block">
-                      {simulation?.scenarios.no_action.affected_area_percent}% Area
+                      {simulation?.scenarios.no_action.affected_area_percent}% {t('Area:')}
                     </span>
                     <span className="text-[11px] text-[#5C6259] block">
-                      Loss: {formatINR(simulation?.scenarios.no_action.estimated_loss || 0)}
+                      {t('Estimated Harvest Loss')}: {formatINR(simulation?.scenarios.no_action.estimated_loss || 0)}
                     </span>
                   </div>
                   <div className="p-4 bg-[#F5F4F0] rounded-xl border border-[#E3E1D9] space-y-1">
-                    <span className="text-[11px] text-[#2F9E5C] font-medium block uppercase">Intervene Today</span>
+                    <span className="text-[11px] text-[#2F9E5C] font-medium block uppercase">{t('Intervene Today')}</span>
                     <span className="text-[20px] font-semibold text-[#14231C] tabular-nums block">
-                      {simulation?.scenarios.intervene_today.affected_area_percent}% Area
+                      {simulation?.scenarios.intervene_today.affected_area_percent}% {t('Area:')}
                     </span>
                     <span className="text-[11px] text-[#5C6259] block">
-                      Loss: {formatINR(simulation?.scenarios.intervene_today.estimated_loss || 0)}
+                      {t('Estimated Harvest Loss')}: {formatINR(simulation?.scenarios.intervene_today.estimated_loss || 0)}
                     </span>
                   </div>
                 </div>
@@ -471,7 +473,7 @@ export default function FarmDetailPage() {
 
               <Link href={`/simulate?farm_id=${farm.id}`}>
                 <button className="w-full rounded-full bg-[#14231C] text-white hover:bg-[#23372E] py-2.5 text-[13px] font-medium transition-all flex items-center justify-center gap-1.5 group">
-                  <span>Open Full Scenario Comparison</span>
+                  <span>{t('Open Full Scenario Comparison')}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </Link>
@@ -481,32 +483,32 @@ export default function FarmDetailPage() {
             <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-7 space-y-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-3">
-                  <h3 className="text-[18px] font-normal text-[#14231C]">Economic Loss Model</h3>
-                  <span className="text-[11px] text-[#5C6259]">MSP Baseline</span>
+                  <h3 className="text-[18px] font-normal text-[#14231C]">{t('MSP Economic Loss Model')}</h3>
+                  <span className="text-[11px] text-[#5C6259]">{t('MSP Baseline')}</span>
                 </div>
 
                 <div className="space-y-2.5 text-[13px] mt-4">
                   <div className="flex justify-between py-1 border-b border-[#E3E1D9]">
-                    <span className="text-[#5C6259]">Gross Harvest Value ({farm.area_acres} Acres):</span>
+                    <span className="text-[#5C6259]">{t('Gross Harvest Value')} ({farm.area_acres} {t('Acres')}):</span>
                     <strong className="text-[#14231C] font-medium tabular-nums">{formatINR(economicAnalysis?.gross_crop_value || 0)}</strong>
                   </div>
                   <div className="flex justify-between py-1 border-b border-[#E3E1D9] text-[#C13B3B]">
-                    <span>Potential Loss (No Action):</span>
+                    <span>{t('Potential Loss (No Action):')}</span>
                     <span className="font-medium tabular-nums">-{formatINR(economicAnalysis?.potential_loss_without_action || 0)}</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-[#E3E1D9] text-[#2F9E5C]">
-                    <span>Avoided Loss with Bio-Control:</span>
+                    <span>{t('Avoided Loss with Bio-Control:')}</span>
                     <span className="font-medium tabular-nums">+{formatINR(economicAnalysis?.avoided_loss || 0)}</span>
                   </div>
                   <div className="flex justify-between py-2 text-[#14231C] font-medium bg-[#F5F4F0] p-3 rounded-xl border border-[#E3E1D9]">
-                    <span>Projected Net Benefit:</span>
+                    <span>{t('Projected Net Benefit:')}</span>
                     <span className="font-semibold tabular-nums">{formatINR(economicAnalysis?.net_benefit || 0)}</span>
                   </div>
                 </div>
               </div>
 
               <p className="text-[11px] text-[#5C6259]">
-                {economicAnalysis?.disclaimer}
+                {t(economicAnalysis?.disclaimer || '')}
               </p>
             </div>
           </div>
@@ -518,9 +520,9 @@ export default function FarmDetailPage() {
         <FadeContent duration={0.3} className="space-y-6">
           {/* Active Alerts */}
           <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-7 space-y-4">
-            <h3 className="text-[18px] font-normal text-[#14231C]">Active Operational Alerts</h3>
+            <h3 className="text-[18px] font-normal text-[#14231C]">{t('History & Alerts')}</h3>
             {alerts.length === 0 ? (
-              <p className="text-[13px] text-[#5C6259] italic">No unread alerts for this plot.</p>
+              <p className="text-[13px] text-[#5C6259] italic">{t('No unread alerts for this plot.')}</p>
             ) : (
               <div className="space-y-2.5">
                 {alerts.map((alert) => (
@@ -534,8 +536,8 @@ export default function FarmDetailPage() {
                   >
                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-[#C13B3B]" />
                     <div>
-                      <strong className="block font-medium">{alert.title}</strong>
-                      <p className="text-[12px] text-[#5C6259] mt-0.5">{alert.message}</p>
+                      <strong className="block font-medium">{t(alert.title)}</strong>
+                      <p className="text-[12px] text-[#5C6259] mt-0.5">{t(alert.message)}</p>
                     </div>
                   </div>
                 ))}
@@ -545,9 +547,9 @@ export default function FarmDetailPage() {
 
           {/* Diagnosis History */}
           <div className="rounded-[22px] border border-[#E3E1D9] bg-white p-7 space-y-4">
-            <h3 className="text-[18px] font-normal text-[#14231C]">Diagnosis History</h3>
+            <h3 className="text-[18px] font-normal text-[#14231C]">{t('Diagnosis History')}</h3>
             {diagnoses.length === 0 ? (
-              <p className="text-[13px] text-[#5C6259] italic">No past diagnoses recorded.</p>
+              <p className="text-[13px] text-[#5C6259] italic">{t('No past diagnoses recorded.')}</p>
             ) : (
               <div className="space-y-2.5">
                 {diagnoses.map((diag) => (
@@ -558,15 +560,15 @@ export default function FarmDetailPage() {
                       </div>
                       <div>
                         <strong className="block font-medium text-[#14231C] capitalize">
-                          {diag.disease?.name || diag.disease_id?.replace(/_/g, ' ')}
+                          {t(diag.disease?.name || diag.disease_id?.replace(/_/g, ' '))}
                         </strong>
                         <span className="text-[11px] text-[#5C6259]">
-                          {new Date(diag.created_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })} · Confidence {Math.round(diag.confidence * 100)}%
+                          {new Date(diag.created_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })} · {t('Confidence')} {Math.round(diag.confidence * 100)}%
                         </span>
                       </div>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#F5F4F0] text-[#14231C] border border-[#E3E1D9]">
-                      {diag.severity.toUpperCase()}
+                      {t(diag.severity.toUpperCase())}
                     </span>
                   </div>
                 ))}
