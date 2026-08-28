@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { mockDb } from '@/lib/supabase/mock-db';
 import { getFarmWeather } from '@/lib/services/weather';
 
@@ -7,7 +8,18 @@ export async function GET(
   { params }: { params: { farmId: string } }
 ) {
   try {
-    const farm = mockDb.getFarmById(params.farmId);
+    const supabase = createServerSupabaseClient();
+
+    let farm: any = null;
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('farms')
+        .select('id, lat, lng')
+        .eq('id', params.farmId)
+        .single();
+      if (!error && data) farm = data;
+    }
+    if (!farm) farm = mockDb.getFarmById(params.farmId);
     if (!farm) {
       return NextResponse.json({ success: false, error: 'Farm not found' }, { status: 404 });
     }

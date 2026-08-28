@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { mockDb } from '@/lib/supabase/mock-db';
 import { getFarmWeather } from '@/lib/services/weather';
 import { calculateDiseaseRisk } from '@/lib/engines/risk-engine';
@@ -124,22 +125,79 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Missing farm_id or message.' }, { status: 400 });
     }
 
-    const farm = mockDb.getFarmById(farm_id);
+    const supabase = createServerSupabaseClient();
+
+    let farm: any = null;
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('farms')
+        .select('*, crop:crops(*)')
+        .eq('id', farm_id)
+        .single();
+      if (!error && data) farm = data;
+    }
+    if (!farm) farm = mockDb.getFarmById(farm_id);
     if (!farm) {
       return NextResponse.json({ success: false, error: 'Farm not found' }, { status: 404 });
     }
 
-    const diagnoses = mockDb.getDiagnosesByFarmId(farm.id);
+    let diagnoses: any[] = [];
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('diagnoses')
+        .select('*')
+        .eq('farm_id', farm.id)
+        .order('created_at', { ascending: false });
+      if (!error && data) diagnoses = data;
+    }
+    if (!diagnoses.length) diagnoses = mockDb.getDiagnosesByFarmId(farm.id);
     const latestDiag = diagnoses[0];
-    const disease = latestDiag?.disease_id ? mockDb.getDiseaseById(latestDiag.disease_id) : mockDb.getDiseases(farm.crop_id)[0];
+
+    let disease: any = null;
+    if (latestDiag?.disease_id) {
+      if (supabase) {
+        const { data } = await supabase
+          .from('diseases')
+          .select('*')
+          .eq('id', latestDiag.disease_id)
+          .single();
+        if (data) disease = data;
+      }
+      if (!disease) disease = mockDb.getDiseaseById(latestDiag.disease_id);
+    }
+    if (!disease) {
+      if (supabase) {
+        const { data } = await supabase
+          .from('diseases')
+          .select('*')
+          .eq('crop_id', farm.crop_id)
+          .limit(1)
+          .single();
+        if (data) disease = data;
+      }
+      if (!disease) disease = mockDb.getDiseases(farm.crop_id)[0];
+    }
+
     const weather = await getFarmWeather(farm.lat, farm.lng, farm.id);
 
-    const nearbyReports = mockDb.getDiseaseReports({
-      disease_id: disease?.id,
-      lat: farm.lat,
-      lng: farm.lng,
-      radius_km: 10,
-    });
+    let nearbyReports: any[] = [];
+    if (supabase && disease?.id) {
+      const { data, error } = await supabase
+        .from('disease_reports')
+        .select('*')
+        .eq('disease_id', disease.id)
+        .order('reported_at', { ascending: false })
+        .limit(20);
+      if (!error && data) nearbyReports = data;
+    }
+    if (!nearbyReports.length) {
+      nearbyReports = mockDb.getDiseaseReports({
+        disease_id: disease?.id,
+        lat: farm.lat,
+        lng: farm.lng,
+        radius_km: 10,
+      });
+    }
 
     const riskPrediction = disease
       ? calculateDiseaseRisk({

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { mockDb } from '@/lib/supabase/mock-db';
 import { diagnoseCropImage } from '@/lib/services/gemini';
 
@@ -14,7 +15,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const farm = mockDb.getFarmById(farm_id);
+    // --- Fetch farm from Supabase or fallback to mockDb ---
+    let farm: any = null;
+    const supabase = createServerSupabaseClient();
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('farms')
+        .select('*, crop:crops(*)')
+        .eq('id', farm_id)
+        .single();
+      if (!error && data) farm = data;
+    }
+    if (!farm) farm = mockDb.getFarmById(farm_id);
     if (!farm) {
       return NextResponse.json({ success: false, error: 'Farm not found.' }, { status: 404 });
     }
@@ -38,15 +50,61 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save diagnosis record
-    const savedDiagnosis = mockDb.createDiagnosis({
-      farm_id: farm.id,
-      image_url: image_url || 'https://images.unsplash.com/photo-1599818816942-881b212f451f?auto=format&fit=crop&w=800&q=80',
-      disease_id: analysis.primary_disease,
-      confidence: analysis.confidence,
-      severity: analysis.severity,
-      analysis_json: analysis,
-    });
+    const savedImageUrl =
+      image_url ||
+      'https://images.unsplash.com/photo-1599818816942-881b212f451f?auto=format&fit=crop&w=800&q=80';
+
+    // --- Persist diagnosis to Supabase or fallback ---
+    let savedDiagnosis: any = null;
+    if (supabase) {
+      try {
+        const { data: diagData, error: diagErr } = await (supabase as any)
+          .from('diagnoses')
+          .insert([
+            {
+              farm_id: farm.id,
+              image_url: savedImageUrl,
+              disease_id: analysis.primary_disease,
+              confidence: analysis.confidence,
+              severity: analysis.severity,
+              analysis_json: analysis,
+            },
+          ])
+          .select('*')
+          .single();
+
+        if (!diagErr && diagData) {
+          savedDiagnosis = diagData;
+
+          // Auto-record high-confidence detections as disease_reports for outbreak tracking
+          if (analysis.confidence >= 0.6 && analysis.primary_disease) {
+            await (supabase as any).from('disease_reports').insert([
+              {
+                farm_id: farm.id,
+                disease_id: analysis.primary_disease,
+                lat: farm.lat,
+                lng: farm.lng,
+                severity: analysis.severity,
+                is_verified: analysis.confidence >= 0.8,
+              },
+            ]);
+          }
+        }
+      } catch (insertErr) {
+        console.warn('Supabase diagnosis insert failed, falling back to mockDb:', insertErr);
+      }
+    }
+
+    if (!savedDiagnosis) {
+      savedDiagnosis = mockDb.createDiagnosis({
+        farm_id: farm.id,
+        image_url: savedImageUrl,
+        disease_id: analysis.primary_disease,
+        confidence: analysis.confidence,
+        severity: analysis.severity,
+        analysis_json: analysis,
+      });
+    }
 
     return NextResponse.json({
       success: true,
