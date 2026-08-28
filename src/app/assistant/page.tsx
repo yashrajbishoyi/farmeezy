@@ -34,7 +34,7 @@ function AssistantContent() {
   const [selectedFarmId, setSelectedFarmId] = useState<string>(initialFarmId);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -57,8 +57,13 @@ How can I help protect your yield today?`,
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages, loading]);
 
   const fetchFarms = async () => {
     try {
@@ -142,7 +147,7 @@ How can I help protect your yield today?`,
       {/* Main Chat Container */}
       <div className="rounded-[24px] border border-[#E3E1D9] bg-white flex flex-col h-[540px] overflow-hidden">
         {/* Messages Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F5F4F0]">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F5F4F0]">
           <AnimatedList staggerDelay={0.06}>
             {messages.map((msg) => (
               <div
@@ -190,8 +195,6 @@ How can I help protect your yield today?`,
               </div>
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Suggested Prompts */}
