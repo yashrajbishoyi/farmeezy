@@ -240,3 +240,25 @@ export interface Alert {
   read: boolean;
   created_at: string;
 }
+
+export type InterventionPriorityTier = 'critical' | 'high' | 'moderate' | 'low';
+
+export interface InterventionFactorDetail {
+  name: string;
+  score: number; // 0-100
+  weight: number; // e.g. 0.40
+  impact: number; // weighted points (e.g. 32)
+  description: string;
+}
+
+export interface InterventionPriorityResult {
+  farm_id: string;
+  priority_score: number; // 0-100
+  priority_tier: InterventionPriorityTier;
+  recommended_action: string;
+  factors: InterventionFactorDetail[];
+  economic_exposure_inr: number; // potential_loss_without_action in INR
+  avoidable_loss_inr: number; // avoided_loss in INR
+  net_benefit_inr: number; // net_benefit in INR
+  evaluated_at: string; // ISO timestamp
+}
