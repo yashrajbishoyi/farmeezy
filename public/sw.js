@@ -1,11 +1,9 @@
-const CACHE_NAME = 'farmeezy-pwa-v1';
+const CACHE_NAME = 'farmeezy-pwa-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/apple-touch-icon.png',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/globals.css'
+  '/icons/icon.svg',
+  '/icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,44 +31,60 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignore non-GET requests or non-HTTP(S) schemes (e.g. chrome-extension://)
   if (event.request.method !== 'GET') return;
   
   const url = new URL(event.request.url);
+  // Ignore non-HTTP(S) schemes (e.g. chrome-extension://)
   if (!url.protocol.startsWith('http')) return;
 
+  // API endpoints: Network-first
   if (url.pathname.startsWith('/api/')) {
-    // API endpoints use Network-First strategy
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          if (response.status === 200) {
+          if (response && response.status === 200) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           }
           return response;
         })
-        .catch(() => {
-          return caches.match(event.request);
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          return cached || new Response(JSON.stringify({ success: false, error: 'Offline' }), {
+            headers: { 'Content-Type': 'application/json' },
+          });
         })
     );
     return;
   }
 
-  // HTML pages & static assets use Stale-While-Revalidate strategy
+  // HTML pages & assets: Stale-While-Revalidate with valid Response guarantee
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
+      const networkFetch = fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          if (
+            networkResponse &&
+            networkResponse.status === 200 &&
+            (networkResponse.type === 'basic' || networkResponse.type === 'cors')
+          ) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           }
           return networkResponse;
         })
-        .catch(() => cachedResponse);
+        .catch(() => null);
 
-      return cachedResponse || fetchPromise;
+      if (cachedResponse) {
+        // Trigger background revalidation
+        networkFetch.catch(() => {});
+        return cachedResponse;
+      }
+
+      return networkFetch.then((res) => {
+        if (res && res instanceof Response) return res;
+        return new Response('Service Unavailable', { status: 503, statusText: 'Service Unavailable' });
+      });
     })
   );
 });

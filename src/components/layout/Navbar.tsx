@@ -36,8 +36,8 @@ export function Navbar() {
   ];
 
   return (
-    <header className="w-full bg-[#F5F4F0] pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-4 px-4 sm:px-10 border-b border-[#E3E1D9]/60 sticky top-0 z-30 backdrop-blur-md bg-[#F5F4F0]/90">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <header className="w-full bg-[#F5F4F0] pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-4 px-4 sm:px-10 border-b border-[#E3E1D9]/60 sticky top-0 z-30 backdrop-blur-md bg-[#F5F4F0]/90" suppressHydrationWarning>
+      <div className="max-w-6xl mx-auto flex items-center justify-between" suppressHydrationWarning>
         {/* Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-2 text-[#14231C] group">
           <Sprout className="h-5 w-5 stroke-[1.75] text-[#14231C]" />
