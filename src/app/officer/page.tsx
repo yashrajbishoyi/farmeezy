@@ -18,14 +18,16 @@ import { formatINR } from '@/lib/utils';
 import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { useTranslation } from '@/lib/context/LanguageContext';
 
+import { mockDb } from '@/lib/supabase/mock-db';
+
 export default function OfficerDashboardPage() {
   const { t } = useTranslation();
-  const [farms, setFarms] = useState<Farm[]>([]);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
   const [clusters, setClusters] = useState<OutbreakCluster[]>([]);
-  const [reports, setReports] = useState<DiseaseReport[]>([]);
+  const [reports, setReports] = useState<DiseaseReport[]>(() => mockDb.getDiseaseReports());
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRiskFilter, setSelectedRiskFilter] = useState<'all' | 'critical' | 'high'>('all');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadOfficerData();
