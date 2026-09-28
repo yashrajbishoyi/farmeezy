@@ -75,19 +75,21 @@ export function WeatherCard({ weather }: WeatherCardProps) {
         <span className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium block">
           {t('7-Day Forecast Matrix')}
         </span>
-        <div className="grid grid-cols-7 gap-1.5 text-center text-[11px]">
-          {weather.daily.slice(0, 7).map((day) => {
-            const dayName = new Date(day.date).toLocaleDateString('en-US', { weekday: 'narrow' });
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="grid grid-cols-7 min-w-[340px] sm:min-w-0 gap-1.5 text-center text-[11px]">
+            {weather.daily.slice(0, 7).map((day) => {
+              const dayName = new Date(day.date).toLocaleDateString('en-US', { weekday: 'narrow' });
 
-            return (
-              <div key={day.date} className="p-2 rounded-lg border border-[#E3E1D9] bg-white space-y-1">
-                <span className="font-medium text-[#14231C] block">{dayName}</span>
-                <span className="text-[10px] text-[#5C6259] block tabular-nums">{day.temp_max.toFixed(0)}°</span>
-                <span className="text-[10px] font-medium text-[#14231C] block tabular-nums">{day.humidity_mean}%</span>
-                <span className="text-[9px] text-[#5C6259] block tabular-nums">{day.rainfall_sum}mm</span>
-              </div>
-            );
-          })}
+              return (
+                <div key={day.date} className="p-2 rounded-lg border border-[#E3E1D9] bg-white space-y-1">
+                  <span className="font-medium text-[#14231C] block">{dayName}</span>
+                  <span className="text-[10px] text-[#5C6259] block tabular-nums">{day.temp_max.toFixed(0)}°</span>
+                  <span className="text-[10px] font-medium text-[#14231C] block tabular-nums">{day.humidity_mean}%</span>
+                  <span className="text-[9px] text-[#5C6259] block tabular-nums">{day.rainfall_sum}mm</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
