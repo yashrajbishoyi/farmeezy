@@ -94,7 +94,7 @@ export default function FarmDetailPage() {
   };
 
   const loadFarmData = async (targetDiseaseId?: string) => {
-    setLoading(true);
+    if (!data) setLoading(true);
     try {
       const queryDisease = targetDiseaseId || selectedDiseaseId;
       const url = queryDisease 
@@ -115,7 +115,7 @@ export default function FarmDetailPage() {
     }
   };
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12 space-y-6">
         <div className="h-10 w-full bg-white rounded-2xl border border-[#E3E1D9] animate-pulse" />

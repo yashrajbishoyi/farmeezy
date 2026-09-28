@@ -9,7 +9,7 @@ export async function getFarmWeather(lat: number, lng: number, farmId: string): 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=auto`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 1500); // Fast 1.5s timeout for instant UX
 
     const res = await fetch(url, { signal: controller.signal, next: { revalidate: 3600 } });
     clearTimeout(timeoutId);
@@ -50,7 +50,7 @@ export async function getFarmWeather(lat: number, lng: number, farmId: string): 
 
     return { current, daily };
   } catch (error) {
-    console.warn('Weather API failed or timed out. Using fallback weather model for demo:', error);
+    console.warn('Weather API fetch fallback engaged for instant telemetry:', error);
     return getFallbackWeather(lat, lng, farmId);
   }
 }
