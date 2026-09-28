@@ -101,13 +101,15 @@ function getSuggestedPrompts(lang: SupportedLang): string[] {
   }
 }
 
+import { mockDb } from '@/lib/supabase/mock-db';
+
 function AssistantContent() {
   const searchParams = useSearchParams();
   const initialFarmId = searchParams.get('farm_id') || DEMO_FARM_ID;
   const { t, language } = useTranslation();
   const lang = language as SupportedLang;
 
-  const [farms, setFarms] = useState<Farm[]>([]);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
   const [selectedFarmId, setSelectedFarmId] = useState<string>(initialFarmId);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);

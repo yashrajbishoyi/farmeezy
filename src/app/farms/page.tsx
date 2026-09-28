@@ -16,16 +16,19 @@ import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useTranslation } from '@/lib/context/LanguageContext';
 
+import { mockDb } from '@/lib/supabase/mock-db';
+import { SEED_CROPS } from '@/lib/seeds/crops';
+
 export default function FarmsPage() {
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const { t } = useTranslation();
   const router = useRouter();
 
   // Quick Farm Creation Modal State
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [crops, setCrops] = useState<Crop[]>([]);
+  const [crops, setCrops] = useState<Crop[]>(SEED_CROPS);
   const [newFarmName, setNewFarmName] = useState('');
   const [newFarmCrop, setNewFarmCrop] = useState('rice');
   const [newFarmArea, setNewFarmArea] = useState('2.5');
