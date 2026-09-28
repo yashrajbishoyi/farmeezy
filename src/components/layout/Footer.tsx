@@ -10,7 +10,7 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="w-full bg-[#1F3A2E] text-[#F5F4F0] pt-14 pb-10 px-6 sm:px-10 mt-20 border-t border-[#182E24]">
+    <footer className="w-full bg-[#1F3A2E] text-[#F5F4F0] pt-14 pb-28 md:pb-10 px-6 sm:px-10 mt-16 sm:mt-20 border-t border-[#182E24]">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Top Row: Brand Lockup & Inverted Pill CTA */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-10 border-b border-[#2B4E3E]">
@@ -74,13 +74,13 @@ export function Footer() {
 
           <div className="space-y-3">
             <span className="text-[11px] uppercase tracking-[0.08em] text-[#869283] font-medium block">
-              {t('Governance')}
+              {t('PWA Web App')}
             </span>
             <ul className="space-y-2.5 text-[#C4CCC1]">
-              <li><span className="text-[#869283]">{t('SIH 2026 Innovation')}</span></li>
-              <li><span className="text-[#869283]">{t('Zero Chemical Dosing Rule')}</span></li>
-              <li><span className="text-[#869283]">{t('ICAR / KVK Compliance')}</span></li>
-              <li><span className="text-[#869283]">{t('Odisha Model Benchmark')}</span></li>
+              <li><span className="text-[#869283]">Android Chrome Support</span></li>
+              <li><span className="text-[#869283]">iOS Safari Web App</span></li>
+              <li><span className="text-[#869283]">Offline Telemetry Cache</span></li>
+              <li><span className="text-[#869283]">Standalone Fullscreen</span></li>
             </ul>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-8 border-t border-[#2B4E3E] text-[11px] text-[#869283]">
           <span>© 2026 Farmeezy. Built for Smart India Hackathon.</span>
           <span className="sm:text-right">
-            Estimated economic values and spread trajectories based on deterministic model calibrations.
+            Progressive Web App enabled for Android & iOS mobile devices.
           </span>
         </div>
       </div>

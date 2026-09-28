@@ -1,10 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { DemoBanner } from '@/components/layout/DemoBanner';
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { LanguageProvider } from '@/lib/context/LanguageContext';
 
@@ -15,9 +16,33 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700'],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#14231C',
+};
+
 export const metadata: Metadata = {
   title: 'Farmeezy — Predictive Crop-Disease Intelligence',
   description: 'Proactive crop disease prediction, outbreak simulation, and economic intelligence platform for Indian agriculture.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Farmeezy',
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +53,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={plusJakartaSans.variable}>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Farmeezy" />
+        <meta name="format-detection" content="telephone=no" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link
@@ -43,7 +74,7 @@ export default function RootLayout({
           crossOrigin=""
         />
       </head>
-      <body className="min-h-screen bg-[#F5F4F0] text-[#14231C] font-sans antialiased flex flex-col selection:bg-[#1F3A2E] selection:text-white pb-16 md:pb-0">
+      <body className="min-h-screen bg-[#F5F4F0] text-[#14231C] font-sans antialiased flex flex-col selection:bg-[#1F3A2E] selection:text-white pb-20 md:pb-0">
         <AuthProvider>
           <LanguageProvider>
             <DemoBanner />
@@ -53,6 +84,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <BottomNav />
+            <PWAInstallPrompt />
           </LanguageProvider>
         </AuthProvider>
       </body>

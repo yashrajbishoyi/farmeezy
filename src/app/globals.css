@@ -24,7 +24,15 @@
     --input: 45 12% 87%;
     --ring: 150 27% 11%;
     --radius: 1.25rem;
+    --sat: env(safe-area-inset-top);
+    --sab: env(safe-area-inset-bottom);
   }
+}
+
+html, body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -33,6 +41,28 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix iOS Safari double-tap auto-zoom on input focus */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Hide scrollbar for clean horizontal tab sliders */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Eyebrow Label Standard */
@@ -45,7 +75,7 @@ body {
   @apply font-normal tracking-[-0.025em] text-[#14231C];
 }
 
-/* Custom Risk Badges (Exact hex values preserved exclusively for risk data) */
+/* Custom Risk Badges */
 .risk-pill-low {
   background-color: #2F9E5C;
   color: #FFFFFF;
@@ -63,11 +93,20 @@ body {
   color: #FFFFFF;
 }
 
-/* Leaflet container fixes */
+/* Leaflet container mobile touch fixes */
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 1.25rem;
   z-index: 10;
   background-color: #F5F4F0;
+  touch-action: pan-x pan-y;
+}
+
+/* Safe area padding helper classes */
+.safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.safe-pt {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
 }

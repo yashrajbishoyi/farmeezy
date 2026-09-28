@@ -239,11 +239,21 @@ STRICT SAFETY & FORMATTING RULES:
     if (apiKey && apiKey !== 'your-gemini-api-key') {
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const modelNames = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+        let rawReply = '';
 
-        const prompt = `${systemPrompt}\n\nFarmer Question: "${message}"`;
-        const result = await model.generateContent(prompt);
-        const rawReply = result.response.text();
+        for (const modelName of modelNames) {
+          try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const prompt = `${systemPrompt}\n\nFarmer Question: "${message}"`;
+            const result = await model.generateContent(prompt);
+            rawReply = result.response.text();
+            if (rawReply) break;
+          } catch (e) {
+            // try next model
+          }
+        }
+
         const reply = cleanTextFormatting(rawReply);
         if (reply) {
           return NextResponse.json({ success: true, reply });

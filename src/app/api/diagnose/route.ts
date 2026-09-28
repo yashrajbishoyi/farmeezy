@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { mockDb } from '@/lib/supabase/mock-db';
-import { diagnoseCropImage } from '@/lib/services/gemini';
+import { diagnoseCropImage, buildFullPathologyTestResult } from '@/lib/services/gemini';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { farm_id, image_base64, mime_type, image_url } = body;
+    const { farm_id, image_base64, mime_type, image_url, disease_id, telemetry } = body;
 
     if (!farm_id || (!image_base64 && !image_url)) {
       return NextResponse.json(
@@ -19,12 +19,16 @@ export async function POST(request: Request) {
     let farm: any = null;
     const supabase = createServerSupabaseClient();
     if (supabase) {
-      const { data, error } = await supabase
-        .from('farms')
-        .select('*, crop:crops(*)')
-        .eq('id', farm_id)
-        .single();
-      if (!error && data) farm = data;
+      try {
+        const { data, error } = await supabase
+          .from('farms')
+          .select('*, crop:crops(*)')
+          .eq('id', farm_id)
+          .single();
+        if (!error && data) farm = data;
+      } catch (err) {
+        console.warn('Supabase farm query failed, will fallback to mockDb:', err);
+      }
     }
     if (!farm) farm = mockDb.getFarmById(farm_id);
     if (!farm) {
@@ -37,14 +41,27 @@ export async function POST(request: Request) {
       mimeType: mime_type || 'image/jpeg',
       cropContext: farm.crop,
       locationContext: { lat: farm.lat, lng: farm.lng },
+      diseaseHint: disease_id,
+      imageUrl: image_url,
+      telemetry,
     });
 
+    const testResult = buildFullPathologyTestResult(
+      analysis,
+      { imageBase64: image_base64 || '', mimeType: mime_type || 'image/jpeg', cropContext: farm.crop, telemetry },
+      farm
+    );
+
     // Check image validation threshold (PRD §8)
-    if (analysis.image_quality < 0.3) {
+    if (
+      analysis.image_quality < 0.3 ||
+      analysis.primary_disease === 'invalid_non_plant_image' ||
+      analysis.crop === 'invalid_image'
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Image is too blurry or low quality for reliable plant disease diagnosis. Please upload a clear photo of the leaf symptoms in daylight.',
+          error: 'The uploaded photo does not appear to be a crop leaf or foliage photo. Please upload a clear photo of plant leaves or crop symptoms taken in daylight.',
         },
         { status: 422 }
       );
@@ -56,7 +73,9 @@ export async function POST(request: Request) {
 
     // --- Persist diagnosis to Supabase or fallback ---
     let savedDiagnosis: any = null;
-    if (supabase) {
+    const isValidUUID = (id: string) => typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    if (supabase && isValidUUID(farm.id)) {
       try {
         const { data: diagData, error: diagErr } = await (supabase as any)
           .from('diagnoses')
@@ -111,6 +130,7 @@ export async function POST(request: Request) {
       data: {
         diagnosis: savedDiagnosis,
         analysis,
+        test_result: testResult,
       },
     });
   } catch (error: any) {

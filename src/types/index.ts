@@ -262,3 +262,52 @@ export interface InterventionPriorityResult {
   net_benefit_inr: number; // net_benefit in INR
   evaluated_at: string; // ISO timestamp
 }
+
+export interface PathologyTestTelemetryInput {
+  lesion_type?: 'spindle_gray' | 'yellow_wavy' | 'concentric_brown' | 'oval_sheath' | 'none';
+  tissue_location?: 'lower_foliage' | 'upper_canopy' | 'leaf_sheath' | 'panicle_neck';
+  symptom_spread?: 'isolated' | 'moderate' | 'widespread';
+  temperature_c?: number;
+  humidity_percent?: number;
+  leaf_wetness_hours?: number;
+  rainfall_24h_mm?: number;
+  nitrogen_dose_kg_acre?: number;
+  irrigation_mode?: 'flood' | 'drip' | 'rainfed';
+  growth_stage?: string;
+}
+
+export interface PathologyTestSectionScores {
+  vision_confidence: number;
+  microclimate_score: number;
+  agronomic_vulnerability: number;
+  regional_cluster_pressure: number;
+  composite_risk_score: number;
+}
+
+export interface FullPathologyTestResult {
+  test_id: string;
+  tested_at: string;
+  crop_name: string;
+  scientific_crop_name: string;
+  primary_disease_id: string;
+  primary_disease_name: string;
+  scientific_pathogen_name: string;
+  category: 'fungal' | 'bacterial' | 'viral' | 'pest' | 'deficiency';
+  confidence: number;
+  severity: SeverityLevel;
+  section_scores: PathologyTestSectionScores;
+  visual_evidence: string[];
+  alternative_diagnoses: AlternativeDiagnosis[];
+  action_plan: {
+    immediate_24h: string;
+    cultural_care: string;
+    biological_agent: string;
+    recommended_timing: string;
+  };
+  economic_impact: {
+    projected_yield_loss_percent: number;
+    potential_financial_loss_inr: number;
+    intervention_cost_inr: number;
+    protected_net_revenue_inr: number;
+  };
+}
