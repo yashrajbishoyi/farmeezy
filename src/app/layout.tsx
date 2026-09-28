@@ -51,10 +51,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={plusJakartaSans.variable}>
+    <html lang="en" className={plusJakartaSans.variable} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Farmeezy" />
@@ -74,7 +75,7 @@ export default function RootLayout({
           crossOrigin=""
         />
       </head>
-      <body className="min-h-screen bg-[#F5F4F0] text-[#14231C] font-sans antialiased flex flex-col selection:bg-[#1F3A2E] selection:text-white pb-20 md:pb-0">
+      <body className="min-h-screen bg-[#F5F4F0] text-[#14231C] font-sans antialiased flex flex-col selection:bg-[#1F3A2E] selection:text-white pb-20 md:pb-0" suppressHydrationWarning>
         <AuthProvider>
           <LanguageProvider>
             <DemoBanner />

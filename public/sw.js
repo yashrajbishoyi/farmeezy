@@ -33,9 +33,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignore non-GET requests or API requests from cache strategy (network-first for API)
+  // Ignore non-GET requests or non-HTTP(S) schemes (e.g. chrome-extension://)
   if (event.request.method !== 'GET') return;
+  
   const url = new URL(event.request.url);
+  if (!url.protocol.startsWith('http')) return;
 
   if (url.pathname.startsWith('/api/')) {
     // API endpoints use Network-First strategy
