@@ -69,30 +69,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     setUser(selectedUser);
-    localStorage.setItem('farmeezy_auth_user', JSON.stringify(selectedUser));
+    try {
+      localStorage.setItem('farmeezy_auth_user', JSON.stringify(selectedUser));
+    } catch (e) {
+      console.error('Failed to save auth state:', e);
+    }
 
     const targetUrl = role === 'farmer' ? `/farm/${selectedUser.farmId || DEMO_FARM_ID}` : '/officer';
-    
-    // First attempt Next router navigation
     router.push(targetUrl);
-
-    // Hard redirect fallback after small delay to guarantee navigation across all mobile/desktop browsers
-    setTimeout(() => {
-      if (typeof window !== 'undefined' && window.location.pathname === '/login') {
-        window.location.href = targetUrl;
-      }
-    }, 150);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('farmeezy_auth_user');
+    try {
+      localStorage.removeItem('farmeezy_auth_user');
+    } catch (e) {
+      console.error('Failed to clear auth state:', e);
+    }
     router.push('/');
-    setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/';
-      }
-    }, 150);
   };
 
   return (

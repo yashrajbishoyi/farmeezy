@@ -30,8 +30,11 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Auto redirect if already logged in
+  // Auto redirect if already logged in + prefetch routes for 0ms Instant Sign In
   useEffect(() => {
+    router.prefetch(`/farm/${DEMO_FARM_ID}`);
+    router.prefetch('/officer');
+
     if (!isLoading && user) {
       const target = user.role === 'farmer' ? `/farm/${user.farmId || DEMO_FARM_ID}` : '/officer';
       router.replace(target);
