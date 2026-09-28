@@ -13,11 +13,12 @@ export interface AuthUser {
   title: string;
   location: string;
   farmId?: string;
+  emailOrPhone?: string;
 }
 
 interface AuthContextType {
   user: AuthUser | null;
-  loginAs: (role: UserRole) => void;
+  loginAs: (role: UserRole, customName?: string, identifier?: string) => void;
   logout: () => void;
   isLoading: boolean;
 }
@@ -47,7 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Read persisted login state from localStorage
     try {
       const stored = localStorage.getItem('farmeezy_auth_user');
       if (stored) {
@@ -60,22 +60,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const loginAs = (role: UserRole) => {
-    const selectedUser = role === 'farmer' ? FARMER_USER : OFFICER_USER;
+  const loginAs = (role: UserRole, customName?: string, identifier?: string) => {
+    const baseUser = role === 'farmer' ? FARMER_USER : OFFICER_USER;
+    const selectedUser: AuthUser = {
+      ...baseUser,
+      name: customName && customName.trim() ? customName.trim() : baseUser.name,
+      emailOrPhone: identifier || undefined,
+    };
+
     setUser(selectedUser);
     localStorage.setItem('farmeezy_auth_user', JSON.stringify(selectedUser));
 
-    if (role === 'farmer') {
-      router.push(`/farm/${DEMO_FARM_ID}`);
-    } else {
-      router.push('/officer');
-    }
+    const targetUrl = role === 'farmer' ? `/farm/${selectedUser.farmId || DEMO_FARM_ID}` : '/officer';
+    
+    // First attempt Next router navigation
+    router.push(targetUrl);
+
+    // Hard redirect fallback after small delay to guarantee navigation across all mobile/desktop browsers
+    setTimeout(() => {
+      if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+        window.location.href = targetUrl;
+      }
+    }, 150);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('farmeezy_auth_user');
     router.push('/');
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+    }, 150);
   };
 
   return (
