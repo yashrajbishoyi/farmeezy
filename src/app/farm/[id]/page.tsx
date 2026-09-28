@@ -43,6 +43,7 @@ import { Stepper, StepItem } from '@/components/react-bits/Stepper';
 import { AnimatedList } from '@/components/react-bits/AnimatedList';
 import { FadeContent } from '@/components/react-bits/FadeContent';
 import { useTranslation } from '@/lib/context/LanguageContext';
+import { getInitialFarmData } from '@/lib/services/farm-helper';
 
 type TabKey = 'overview' | 'factors' | 'weather' | 'simulation' | 'history';
 
@@ -53,7 +54,7 @@ export default function FarmDetailPage() {
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [allFarms, setAllFarms] = useState<Farm[]>([]);
   const [selectedDiseaseId, setSelectedDiseaseId] = useState<string | null>(null);
   const [data, setData] = useState<{
@@ -64,12 +65,12 @@ export default function FarmDetailPage() {
     disease: Disease;
     availableDiseases?: Disease[];
     growthStage?: GrowthStage;
-    riskPrediction: RiskPrediction;
-    simulation: Simulation;
-    economicAnalysis: EconomicAnalysis;
-    recommendation: ActionRecommendation;
+    riskPrediction: RiskPrediction | null;
+    simulation: Simulation | null;
+    economicAnalysis: EconomicAnalysis | null;
+    recommendation: ActionRecommendation | null;
     alerts: Alert[];
-  } | null>(null);
+  } | null>(() => farmId ? (getInitialFarmData(farmId) as any) : null);
 
   useEffect(() => {
     fetchFarmsList();
@@ -77,6 +78,13 @@ export default function FarmDetailPage() {
 
   useEffect(() => {
     if (farmId) {
+      const initial = getInitialFarmData(farmId, selectedDiseaseId || undefined);
+      if (initial) {
+        setData(initial);
+        if (!selectedDiseaseId && initial.disease) {
+          setSelectedDiseaseId(initial.disease.id);
+        }
+      }
       loadFarmData();
     }
   }, [farmId]);
@@ -94,7 +102,6 @@ export default function FarmDetailPage() {
   };
 
   const loadFarmData = async (targetDiseaseId?: string) => {
-    if (!data) setLoading(true);
     try {
       const queryDisease = targetDiseaseId || selectedDiseaseId;
       const url = queryDisease 
@@ -102,7 +109,7 @@ export default function FarmDetailPage() {
         : `/api/farms/${farmId}`;
       const res = await fetch(url);
       const json = await res.json();
-      if (json.success) {
+      if (json.success && json.data) {
         setData(json.data);
         if (!selectedDiseaseId && json.data.disease) {
           setSelectedDiseaseId(json.data.disease.id);
@@ -129,7 +136,7 @@ export default function FarmDetailPage() {
     );
   }
 
-  if (!data || !data.farm) {
+  if (!data || !data.farm || !data.riskPrediction) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 text-center space-y-4">
         <h2 className="text-[24px] font-normal text-[#14231C]">{t('Farm Not Found')}</h2>
