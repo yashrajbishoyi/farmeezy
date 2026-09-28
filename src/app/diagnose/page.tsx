@@ -67,6 +67,8 @@ const DEMO_SAMPLES = [
   },
 ];
 
+import { mockDb } from '@/lib/supabase/mock-db';
+
 function DiagnoseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,7 +76,7 @@ function DiagnoseContent() {
   const { t } = useTranslation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [farms, setFarms] = useState<Farm[]>([]);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
   const [selectedFarmId, setSelectedFarmId] = useState(targetFarmId);
   const [previewImage, setPreviewImage] = useState<string>(DEMO_SAMPLES[0].url);
   const [imageBase64, setImageBase64] = useState<string>('');

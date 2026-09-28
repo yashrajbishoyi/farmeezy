@@ -27,19 +27,21 @@ import { formatINR } from '@/lib/utils';
 import { CountUp } from '@/components/react-bits/CountUp';
 import { useTranslation } from '@/lib/context/LanguageContext';
 
+import { mockDb } from '@/lib/supabase/mock-db';
+
 function SimulateContent() {
   const searchParams = useSearchParams();
   const initialFarmId = searchParams.get('farm_id') || DEMO_FARM_ID;
   const { t } = useTranslation();
 
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [diseases, setDiseases] = useState<any[]>([]);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
+  const [diseases, setDiseases] = useState<any[]>(() => mockDb.getDiseases());
   const [selectedFarmId, setSelectedFarmId] = useState<string>(initialFarmId);
   const [selectedDiseaseId, setSelectedDiseaseId] = useState<string>('rice_blast');
   const [simulation, setSimulation] = useState<Simulation | null>(null);
   const [activeScenario, setActiveScenario] = useState<'no_action' | 'intervene_today' | 'intervene_day3'>('no_action');
   const [delayDays, setDelayDays] = useState<number>(3);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [propagationFactor, setPropagationFactor] = useState(0.18);
   const [weatherModifier, setWeatherModifier] = useState(1.15);

@@ -14,19 +14,21 @@ import { DEMO_FARM_ID } from '@/lib/seeds/demo-farms';
 import { CountUp } from '@/components/react-bits/CountUp';
 import { useTranslation } from '@/lib/context/LanguageContext';
 
+import { mockDb } from '@/lib/supabase/mock-db';
+
 function MapViewContent() {
   const searchParams = useSearchParams();
   const initialFarmId = searchParams.get('farm_id') || DEMO_FARM_ID;
   const { t } = useTranslation();
 
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [reports, setReports] = useState<DiseaseReport[]>([]);
+  const [farms, setFarms] = useState<Farm[]>(() => mockDb.getFarms());
+  const [reports, setReports] = useState<DiseaseReport[]>(() => mockDb.getDiseaseReports());
   const [clusters, setClusters] = useState<OutbreakCluster[]>([]);
-  const [diseases, setDiseases] = useState<Disease[]>([]);
+  const [diseases, setDiseases] = useState<Disease[]>(() => mockDb.getDiseases());
   const [selectedDisease, setSelectedDisease] = useState<string>('all');
   const [selectedRadius, setSelectedRadius] = useState<number>(25);
   const [selectedFarmId, setSelectedFarmId] = useState<string>(initialFarmId);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadMapData();
