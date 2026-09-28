@@ -14,8 +14,8 @@ import {
   ShieldCheck 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Crop } from '@/types';
+import { useTranslation } from '@/lib/context/LanguageContext';
 
 const PRESET_LOCATIONS = [
   { label: 'Cuttack Basin (Central Odisha)', lat: 20.4625, lng: 85.8828 },
@@ -27,6 +27,7 @@ const PRESET_LOCATIONS = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [crops, setCrops] = useState<Crop[]>([]);
   const [loading, setLoading] = useState(false);
@@ -90,193 +91,196 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl shadow-xl border-emerald-950/10 bg-white">
-        <CardHeader className="bg-gradient-to-r from-emerald-800 to-teal-800 text-white rounded-t-xl p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-emerald-700/80 rounded-xl">
-                <Sprout className="h-6 w-6 text-emerald-200" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-white font-bold">Farmeezy Onboarding</CardTitle>
-                <CardDescription className="text-emerald-100/80 text-xs">
-                  Step {step} of 3 — Setup Your Farm Profile
-                </CardDescription>
-              </div>
+    <div className="max-w-xl mx-auto px-4 py-8 sm:py-12 space-y-6">
+      
+      {/* Container Card */}
+      <div className="rounded-[26px] border border-[#E3E1D9] bg-white overflow-hidden space-y-6 p-6 sm:p-8">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#E3E1D9] pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#14231C] text-white flex items-center justify-center shrink-0">
+              <Sprout className="h-5 w-5" />
             </div>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3].map((s) => (
-                <div
-                  key={s}
-                  className={`h-2 rounded-full transition-all ${
-                    s === step ? 'w-6 bg-amber-400' : s < step ? 'w-2 bg-emerald-400' : 'w-2 bg-emerald-900'
-                  }`}
-                />
-              ))}
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.08em] text-[#5C6259] font-medium">
+                {t('PLOT REGISTRATION')}
+              </div>
+              <h1 className="text-[20px] font-normal text-[#14231C]">
+                {t('Farm Onboarding')}
+              </h1>
             </div>
           </div>
-        </CardHeader>
 
-        <CardContent className="p-6 space-y-6">
-          {/* Step 1: Location & Farm Name */}
-          {step === 1 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div>
-                <label className="text-sm font-bold text-slate-800 block mb-1">
-                  Farm / Plot Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Maa Tarini Paddy Field"
-                  value={farmName}
-                  onChange={(e) => setFarmName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-bold text-slate-800 block mb-1.5">
-                  Select Agro-Climatic Zone / Location
-                </label>
-                <div className="space-y-2">
-                  {PRESET_LOCATIONS.map((loc, idx) => (
-                    <div
-                      key={loc.label}
-                      onClick={() => setSelectedLocIndex(idx)}
-                      className={`p-3 rounded-lg border text-sm cursor-pointer transition-all flex items-center justify-between ${
-                        selectedLocIndex === idx
-                          ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-semibold ring-1 ring-emerald-500'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <MapPin className={`h-4 w-4 ${selectedLocIndex === idx ? 'text-emerald-600' : 'text-slate-400'}`} />
-                        <span>{loc.label}</span>
-                      </div>
-                      <span className="text-xs text-slate-400">
-                        {loc.lat.toFixed(2)}, {loc.lng.toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Crop & Variety */}
-          {step === 2 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div>
-                <label className="text-sm font-bold text-slate-800 block mb-1.5">
-                  Select Monitored Crop
-                </label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {crops.map((c) => (
-                    <div
-                      key={c.id}
-                      onClick={() => setSelectedCropId(c.id)}
-                      className={`p-3.5 rounded-lg border text-sm cursor-pointer transition-all ${
-                        selectedCropId === c.id
-                          ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-bold ring-1 ring-emerald-500'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
-                      }`}
-                    >
-                      <span className="block">{c.name}</span>
-                      <span className="text-[11px] text-slate-400 italic block mt-0.5">{c.scientific_name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-bold text-slate-800 block mb-1">
-                  Variety / Cultivar
-                </label>
-                <input
-                  type="text"
-                  value={variety}
-                  onChange={(e) => setVariety(e.target.value)}
-                  placeholder="e.g. Swarna, Pooja, Lalat, MTU 1010"
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Area & Sowing Date */}
-          {step === 3 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-bold text-slate-800 block mb-1">
-                    Field Area (Acres)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    value={areaAcres}
-                    onChange={(e) => setAreaAcres(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                  />
-                  <p className="text-[11px] text-slate-400 mt-1">Used for economic yield loss modeling</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-bold text-slate-800 block mb-1">
-                    Sowing Date
-                  </label>
-                  <input
-                    type="date"
-                    value={sowingDate}
-                    onChange={(e) => setSowingDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                  />
-                  <p className="text-[11px] text-slate-400 mt-1">Computes vulnerability stage</p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-2">
-                <div className="flex items-center gap-2 text-emerald-900 font-bold text-xs">
-                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                  What Farmeezy will predict automatically:
-                </div>
-                <ul className="text-xs text-emerald-800 space-y-1 list-disc list-inside">
-                  <li>Current Growth Stage & Pathogen Susceptibility Index</li>
-                  <li>Live Micro-climate & 7-Day Rainfall/Humidity Forecast</li>
-                  <li>Regional Outbreak Pressure from nearby monitored plots</li>
-                  <li>Simulated Yield Loss & ROI of biological intervention</li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* Stepper Navigation Buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-            {step > 1 ? (
-              <Button variant="outline" size="sm" onClick={() => setStep(step - 1)}>
-                <ArrowLeft className="mr-1.5 h-4 w-4" />
-                Previous
-              </Button>
-            ) : (
-              <div />
-            )}
-
-            {step < 3 ? (
-              <Button variant="agri" size="sm" onClick={() => setStep(step + 1)}>
-                Next Step
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button variant="agri" size="sm" disabled={loading} onClick={handleSubmit} className="bg-emerald-600 hover:bg-emerald-700">
-                <Sparkles className="mr-1.5 h-4 w-4 text-amber-300" />
-                {loading ? 'Initializing Telemetry...' : 'Launch Farm Dashboard'}
-              </Button>
-            )}
+          <div className="flex items-center gap-1">
+            {[1, 2, 3].map((s) => (
+              <div
+                key={s}
+                className={`h-2 rounded-full transition-all ${
+                  s === step ? 'w-6 bg-[#14231C]' : s < step ? 'w-2 bg-[#2F9E5C]' : 'w-2 bg-[#E3E1D9]'
+                }`}
+              />
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Step 1: Location & Farm Name */}
+        {step === 1 && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div>
+              <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1">
+                {t('Farm / Plot Name')}
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Maa Tarini Paddy Field"
+                value={farmName}
+                onChange={(e) => setFarmName(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#E3E1D9] rounded-xl text-[13px] bg-[#F5F4F0] focus:outline-none focus:border-[#14231C]"
+              />
+            </div>
+
+            <div>
+              <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1.5">
+                {t('Select Agro-Climatic Zone / Location')}
+              </label>
+              <div className="space-y-2">
+                {PRESET_LOCATIONS.map((loc, idx) => (
+                  <div
+                    key={loc.label}
+                    onClick={() => setSelectedLocIndex(idx)}
+                    className={`p-3.5 rounded-xl border text-[13px] cursor-pointer transition-all flex items-center justify-between ${
+                      selectedLocIndex === idx
+                        ? 'border-[#14231C] bg-[#F5F4F0] text-[#14231C] font-medium'
+                        : 'border-[#E3E1D9] hover:border-[#14231C]/40 text-[#5C6259] bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <MapPin className={`h-4 w-4 ${selectedLocIndex === idx ? 'text-[#14231C]' : 'text-[#5C6259]'}`} />
+                      <span>{loc.label}</span>
+                    </div>
+                    <span className="text-[11px] text-[#5C6259]">
+                      {loc.lat.toFixed(2)}, {loc.lng.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Crop & Variety */}
+        {step === 2 && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div>
+              <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1.5">
+                {t('Select Monitored Crop')}
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                {crops.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => setSelectedCropId(c.id)}
+                    className={`p-3.5 rounded-xl border text-[13px] cursor-pointer transition-all ${
+                      selectedCropId === c.id
+                        ? 'border-[#14231C] bg-[#F5F4F0] text-[#14231C] font-medium'
+                        : 'border-[#E3E1D9] hover:border-[#14231C]/40 text-[#5C6259] bg-white'
+                    }`}
+                  >
+                    <span className="block font-medium text-[#14231C]">{t(c.name)}</span>
+                    <span className="text-[11px] text-[#5C6259] italic block mt-0.5">{c.scientific_name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1">
+                {t('Variety / Cultivar')}
+              </label>
+              <input
+                type="text"
+                value={variety}
+                onChange={(e) => setVariety(e.target.value)}
+                placeholder="e.g. Swarna, Pooja, Lalat, MTU 1010"
+                className="w-full px-4 py-2.5 border border-[#E3E1D9] rounded-xl text-[13px] bg-[#F5F4F0] focus:outline-none focus:border-[#14231C]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Area & Sowing Date */}
+        {step === 3 && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1">
+                  {t('Field Area (Acres)')}
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  value={areaAcres}
+                  onChange={(e) => setAreaAcres(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-[#E3E1D9] rounded-xl text-[13px] bg-[#F5F4F0] focus:outline-none focus:border-[#14231C]"
+                />
+                <p className="text-[11px] text-[#5C6259] mt-1">{t('Used for economic yield loss modeling')}</p>
+              </div>
+
+              <div>
+                <label className="text-[12px] font-medium text-[#14231C] uppercase block mb-1">
+                  {t('Sowing Date')}
+                </label>
+                <input
+                  type="date"
+                  value={sowingDate}
+                  onChange={(e) => setSowingDate(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-[#E3E1D9] rounded-xl text-[13px] bg-[#F5F4F0] focus:outline-none focus:border-[#14231C]"
+                />
+                <p className="text-[11px] text-[#5C6259] mt-1">{t('Computes vulnerability stage')}</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-[#F5F4F0] rounded-xl border border-[#E3E1D9] space-y-2 text-[12px]">
+              <div className="flex items-center gap-2 text-[#14231C] font-medium">
+                <ShieldCheck className="h-4 w-4 text-[#2F9E5C]" />
+                {t('What Farmeezy will predict automatically:')}
+              </div>
+              <ul className="text-[12px] text-[#5C6259] space-y-1 list-disc list-inside">
+                <li>{t('Current Growth Stage & Pathogen Susceptibility Index')}</li>
+                <li>{t('Live Micro-climate & 7-Day Rainfall/Humidity Forecast')}</li>
+                <li>{t('Regional Outbreak Pressure from nearby monitored plots')}</li>
+                <li>{t('Simulated Yield Loss & ROI of biological intervention')}</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Stepper Navigation Buttons */}
+        <div className="flex items-center justify-between pt-4 border-t border-[#E3E1D9]">
+          {step > 1 ? (
+            <Button variant="paper" size="sm" onClick={() => setStep(step - 1)}>
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              {t('Previous')}
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          {step < 3 ? (
+            <Button variant="default" size="sm" onClick={() => setStep(step + 1)}>
+              {t('Next Step')}
+              <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button variant="default" size="sm" disabled={loading} onClick={handleSubmit}>
+              <Sparkles className="mr-1.5 h-4 w-4 text-[#2F9E5C]" />
+              {loading ? t('Initializing Telemetry...') : t('Launch Farm Dashboard')}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
